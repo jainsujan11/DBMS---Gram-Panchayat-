@@ -1,0 +1,181 @@
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from connect import get_db, close_db
+
+employee_bp = Blueprint('employee', __name__)
+
+@employee_bp.route('/')
+def employee_dashboard():
+    if 'user_type' not in session or session['user_type'] != 'employee':
+        flash("Unauthorized access")
+        return redirect(url_for('auth.login'))
+    return render_template('employee_dashboard.html')
+
+# -----------------------------
+# Dynamic Query Module
+# -----------------------------
+@employee_bp.route('/query', methods=['GET', 'POST'])
+def employee_query_select():
+    if 'user_type' not in session or session['user_type'] != 'employee':
+        flash("Unauthorized access")
+        return redirect(url_for('auth.login'))
+    if request.method == 'POST':
+        query_category = request.form.get('query_category')
+        return redirect(url_for('employee.employee_query_form', query_type=query_category))
+    return render_template('employee_query_select.html')
+
+@employee_bp.route('/query/<query_type>', methods=['GET', 'POST'])
+def employee_query_form(query_type):
+    if 'user_type' not in session or session['user_type'] != 'employee':
+        flash("Unauthorized access")
+        return redirect(url_for('auth.login'))
+    results = None
+    if request.method == 'POST':
+        conn = get_db()
+        cur = conn.cursor()
+        if query_type == 'citizen':
+            name = request.form.get('name')
+            gender = request.form.get('gender')
+            edu = request.form.get('educational_qualification')
+            min_land = request.form.get('min_land')
+            max_income = request.form.get('max_income')
+            dob = request.form.get('dob')
+            is_pradhan = request.form.get('is_pradhan')
+            is_employee = request.form.get('is_employee')
+            vacc_year = request.form.get('vaccination_year')
+            
+            query = "SELECT * FROM v_citizen WHERE 1=1"
+            params = []
+            if name:
+                query += " AND name ILIKE %s"
+                params.append('%' + name + '%')
+            if gender and gender != "Any":
+                query += " AND gender = %s"
+                params.append(gender)
+            if edu:
+                query += " AND educational_qualification ILIKE %s"
+                params.append('%' + edu + '%')
+            if min_land:
+                query += " AND area_acres >= %s"
+                params.append(min_land)
+            if max_income:
+                query += " AND income <= %s"
+                params.append(max_income)
+            if dob:
+                query += " AND dob = %s"
+                params.append(dob)
+            if is_pradhan == 'on':
+                query += " AND panchayat_role = 'Pradhan'"
+            if is_employee == 'on':
+                query += " AND panchayat_role IS NOT NULL"
+            if vacc_year:
+                query += " AND EXTRACT(YEAR FROM date_administered) = %s"
+                params.append(vacc_year)
+            cur.execute(query, tuple(params))
+            results = cur.fetchall()
+        
+        elif query_type == 'asset':
+            locality = request.form.get('locality')
+            year = request.form.get('year')
+            asset_type = request.form.get('asset_type')
+            query = "SELECT * FROM assets WHERE 1=1"
+            params = []
+            if locality:
+                query += " AND location ILIKE %s"
+                params.append('%' + locality + '%')
+            if year:
+                query += " AND EXTRACT(YEAR FROM installation_date) = %s"
+                params.append(year)
+            if asset_type:
+                query += " AND type = %s"
+                params.append(asset_type)
+            cur.execute(query, tuple(params))
+            results = cur.fetchall()
+        
+        elif query_type == 'land':
+            crop = request.form.get('crop')
+            query = "SELECT * FROM land_records WHERE 1=1"
+            params = []
+            if crop:
+                query += " AND crop_type ILIKE %s"
+                params.append('%' + crop + '%')
+            cur.execute(query, tuple(params))
+            results = cur.fetchall()
+        conn.close()
+        return render_template('employee_query_form.html', query_type=query_type, results=results)
+    return render_template('employee_query_form.html', query_type=query_type, results=results)
+
+# -----------------------------
+# Add/Modify Module
+# -----------------------------
+@employee_bp.route('/add', methods=['GET'])
+def employee_add_select():
+    if 'user_type' not in session or session['user_type'] != 'employee':
+        flash("Unauthorized access")
+        return redirect(url_for('auth.login'))
+    return render_template('employee_add_select.html')
+
+@employee_bp.route('/add/citizen', methods=['GET', 'POST'])
+def employee_add_citizen():
+    if 'user_type' not in session or session['user_type'] != 'employee':
+        flash("Unauthorized access")
+        return redirect(url_for('auth.login'))
+    if request.method == 'POST':
+        name = request.form.get('name')
+        gender = request.form.get('gender')
+        dob = request.form.get('dob')
+        educational_qualification = request.form.get('educational_qualification')
+        household_id = request.form.get('household_id')
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("INSERT INTO citizens (name, gender, dob, household_id, educational_qualification) VALUES (%s, %s, %s, %s, %s)",
+                    (name, gender, dob, household_id, educational_qualification))
+        conn.commit()
+        conn.close()
+        flash("Citizen record added successfully.")
+        return redirect(url_for('employee.employee_add_select'))
+    conn = get_db()
+    households = conn.cursor().execute("SELECT * FROM households")
+    print(households)
+    conn.close()
+    return render_template('employee_add_citizen.html', households=households)
+
+@employee_bp.route('/add/land', methods=['GET', 'POST'])
+def employee_add_land():
+    if 'user_type' not in session or session['user_type'] != 'employee':
+        flash("Unauthorized access")
+        return redirect(url_for('auth.login'))
+    if request.method == 'POST':
+        citizen_id = request.form.get('citizen_id')
+        area_acres = request.form.get('area_acres')
+        crop_type = request.form.get('crop_type')
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("INSERT INTO land_records (citizen_id, area_acres, crop_type) VALUES (%s, %s, %s)",
+                    (citizen_id, area_acres, crop_type))
+        conn.commit()
+        conn.close()
+        flash("Land record added successfully.")
+        return redirect(url_for('employee.employee_add_select'))
+    conn = get_db()
+    citizens = conn.cursor().execute("SELECT citizen_id, name FROM citizens").fetchall()
+    conn.close()
+    return render_template('employee_add_land.html', citizens=citizens)
+
+@employee_bp.route('/add/asset', methods=['GET', 'POST'])
+def employee_add_asset():
+    if 'user_type' not in session or session['user_type'] != 'employee':
+        flash("Unauthorized access")
+        return redirect(url_for('auth.login'))
+    if request.method == 'POST':
+        asset_type = request.form.get('asset_type')
+        location = request.form.get('location')
+        installation_date = request.form.get('installation_date')
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("INSERT INTO assets (type, location, installation_date) VALUES (%s,%s,%s)",
+                    (asset_type, location, installation_date))
+        conn.commit()
+        conn.close()
+        flash("Asset record added successfully.")
+        return redirect(url_for('employee.employee_add_select'))
+    return render_template('employee_add_asset.html')

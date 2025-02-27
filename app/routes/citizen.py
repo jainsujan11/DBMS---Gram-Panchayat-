@@ -1,6 +1,6 @@
 # app/citizen.py
 from flask import Blueprint, render_template, session, flash, redirect, url_for
-from app.connect import get_db, close_db  # Fix import
+from connect import get_db, close_db  # Fix import
 
 citizen_bp = Blueprint('citizen', __name__)
 
@@ -13,10 +13,9 @@ def citizen_dashboard():
     citizen_id = session.get('citizen_id')
     conn = get_db()
     cur = conn.cursor()
-
     cur.execute("SELECT * FROM citizens WHERE citizen_id = %s", (citizen_id,))
     citizen = cur.fetchone()
-
+    # convert it to a dictionary
     cur.execute("SELECT * FROM land_records WHERE citizen_id = %s", (citizen_id,))
     lands = cur.fetchall()
 

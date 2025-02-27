@@ -1,6 +1,6 @@
 # app/admin.py
 from flask import Blueprint, render_template, request, flash, session, redirect, url_for
-from app.connect import get_db, close_db  # Fix import
+from connect import get_db, close_db  # Fix import
 
 admin_bp = Blueprint('admin', __name__)
 

@@ -1,7 +1,7 @@
 # app/auth.py
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
-from app.connect import get_db, close_db  # Use correct import
+from connect import get_db, close_db  # Use correct import
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -26,7 +26,7 @@ def login():
             session['user_type'] = user[2]
             session['citizen_id'] = user[3]
             flash("Logged in successfully!")
-            return redirect(url_for('app_routes.dashboard'))  # Redirect to dashboard
+            return redirect(url_for('dashboard'))  # Redirect to dashboard
         else:
             flash("Invalid credentials")
             return redirect(url_for('auth.login'))  # Redirect back to login

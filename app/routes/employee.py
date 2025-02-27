@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from connect import get_db, close_db
+import psycopg2
+import psycopg2.extras
 
 employee_bp = Blueprint('employee', __name__)
 
@@ -134,8 +136,9 @@ def employee_add_citizen():
         flash("Citizen record added successfully.")
         return redirect(url_for('employee.employee_add_select'))
     conn = get_db()
-    households = conn.cursor().execute("SELECT * FROM households")
-    print(households)
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur.execute("SELECT * FROM households")  # Execute the query
+    households = cur.fetchall()  # Fetch all results
     conn.close()
     return render_template('employee_add_citizen.html', households=households)
 
@@ -157,7 +160,9 @@ def employee_add_land():
         flash("Land record added successfully.")
         return redirect(url_for('employee.employee_add_select'))
     conn = get_db()
-    citizens = conn.cursor().execute("SELECT citizen_id, name FROM citizens").fetchall()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur.execute("SELECT citizen_id, name FROM citizens")
+    citizens = cur.fetchall()
     conn.close()
     return render_template('employee_add_land.html', citizens=citizens)
 

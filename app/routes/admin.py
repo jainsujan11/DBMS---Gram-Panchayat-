@@ -26,6 +26,6 @@ def admin_dashboard():
             flash("Error executing query: " + str(e))
         finally:
             cur.close()
-            close_db(conn)
+            close_db()
 
     return render_template('admin.html', result=result, query_executed=query_executed)

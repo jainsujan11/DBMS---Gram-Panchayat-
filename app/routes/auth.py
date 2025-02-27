@@ -17,7 +17,6 @@ def login():
         # Fetch user from DB
         cur.execute("SELECT id, password, user_type, citizen_id FROM users WHERE username = %s", (username,))
         user = cur.fetchone()  # Returns tuple: (id, password_hash, user_type, citizen_id)
-        print(user)
         cur.close()
         close_db(conn)
 
@@ -91,7 +90,7 @@ def signup():
     cur.execute("SELECT household_id, address FROM households")
     households = cur.fetchall()
     cur.close()
-    close_db(conn)
+    close_db()
 
     return render_template('signup.html', households=households)
 

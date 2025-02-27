@@ -20,7 +20,7 @@ def govt_dashboard():
     total_citizens = cur.fetchone()[0]  # Fetch as tuple
 
     cur.close()
-    close_db(conn)
+    close_db()
 
     stats = {'total_rice': total_rice, 'total_citizens': total_citizens}
     return render_template('govt.html', stats=stats)

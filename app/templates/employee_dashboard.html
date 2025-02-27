@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+    <h2>Panchayat Employee Dashboard</h2>
+    <p>Please choose an option:</p>
+    <ul>
+        <li><a href="{{ url_for('employee.employee_query_select') }}">Query Data</a></li>
+        <li><a href="{{ url_for('employee.employee_add_select') }}">Add / Modify Data</a></li>
+    </ul>
+</div>
+{% endblock %}

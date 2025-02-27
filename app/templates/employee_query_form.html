@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+    <h2>Employee Query - {{ query_type|capitalize }} Filters</h2>
+    <form method="post" action="{{ url_for('employee.employee_query_form', query_type=query_type) }}">
+        {% if query_type == 'citizen' %}
+            <label>Name:</label><br>
+            <input type="text" name="name"><br>
+            <label>Gender:</label><br>
+            <select name="gender">
+                <option value="Any">Any</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select><br>
+            <label>Educational Qualification:</label><br>
+            <input type="text" name="educational_qualification"><br>
+            <label>Minimum Land (acres):</label><br>
+            <input type="number" step="0.1" name="min_land"><br>
+            <label>Max Household Income:</label><br>
+            <input type="number" step="0.01" name="max_income"><br>
+            <label>Date of Birth:</label><br>
+            <input type="date" name="dob"><br>
+            <label>Only Pradhan?</label>
+            <input type="checkbox" name="is_pradhan"><br>
+            <label>Only any Employee? (i.e., has a role)</label>
+            <input type="checkbox" name="is_employee"><br>
+            <label>Vaccination Year:</label><br>
+            <input type="number" name="vaccination_year"><br>
+        {% elif query_type == 'asset' %}
+            <label>Locality:</label><br>
+            <input type="text" name="locality"><br>
+            <label>Year of Installation:</label><br>
+            <input type="number" name="year"><br>
+            <label>Asset Type:</label><br>
+            <select name="asset_type">
+                <option value="">Any</option>
+                <option value="Street Light">Street Light</option>
+                <option value="Water Pump">Water Pump</option>
+                <option value="Road">Road</option>
+            </select><br>
+        {% elif query_type == 'land' %}
+            <label>Crop Type:</label><br>
+            <input type="text" name="crop"><br>
+        {% endif %}
+        <br>
+        <button type="submit">Run Query</button>
+    </form>
+    {% if results is not none %}
+        <h3>Results:</h3>
+        {% if results %}
+        <table>
+            <tr>
+                {% for col in results[0].keys() %}
+                    <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in results %}
+            <tr>
+                {% for col in row.keys() %}
+                    <td>{{ row[col] }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+            <p>No results found.</p>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

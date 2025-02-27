@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="form-container">
+    <h2>Sign Up</h2>
+    <form method="post" action="{{ url_for('auth.signup') }}">
+        <label>Username:</label><br>
+        <input type="text" name="username" required><br>
+        <label>Password:</label><br>
+        <input type="password" name="password" required><br>
+        <label>User Type:</label><br>
+        <select name="user_type" id="user_type" onchange="toggleCitizenFields()">
+            <option value="citizen">Citizen</option>
+            <option value="employee">Panchayat Employee</option>
+            <option value="govt">Government Monitor</option>
+            <option value="admin">System Administrator</option>
+        </select><br><br>
+        <div id="citizen_fields">
+            <h3>Citizen Details</h3>
+            <label>Name:</label><br>
+            <input type="text" name="name"><br>
+            <label>Gender:</label><br>
+            <select name="gender">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select><br>
+            <label>Date of Birth:</label><br>
+            <input type="date" name="dob"><br>
+            <label>Educational Qualification:</label><br>
+            <input type="text" name="educational_qualification"><br>
+            <label>Household:</label><br>
+            <input type="radio" name="household_choice" value="existing" checked> Join Existing
+            <input type="radio" name="household_choice" value="new"> Create New<br>
+            <div id="existing_household_div">
+                <label>Select Household:</label><br>
+                <select name="existing_household">
+                    {% for h in households %}
+                        <option value="{{ h.household_id }}">{{ h.address }} (Income: {{ h.income }})</option>
+                    {% endfor %}
+                </select><br>
+            </div>
+            <div id="new_household_div" style="display:none;">
+                <label>Address:</label><br>
+                <input type="text" name="address"><br>
+                <label>Income:</label><br>
+                <input type="number" name="income" step="0.01"><br>
+            </div>
+        </div>
+        <br>
+        <button type="submit">Sign Up</button>
+    </form>
+</div>
+<script>
+function toggleCitizenFields() {
+    var userType = document.getElementById("user_type").value;
+    var citizenFields = document.getElementById("citizen_fields");
+    if(userType === 'citizen') {
+        citizenFields.style.display = "block";
+    } else {
+        citizenFields.style.display = "none";
+    }
+}
+document.getElementsByName("household_choice").forEach(function(elem){
+    elem.addEventListener("change", function(){
+        if(this.value === "new"){
+            document.getElementById("new_household_div").style.display = "block";
+            document.getElementById("existing_household_div").style.display = "none";
+        } else {
+            document.getElementById("new_household_div").style.display = "none";
+            document.getElementById("existing_household_div").style.display = "block";
+        }
+    });
+});
+</script>
+{% endblock %}
+a

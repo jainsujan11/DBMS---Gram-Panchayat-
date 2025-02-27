@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+    <h2>System Administrator Dashboard</h2>
+    <h3>Execute SQL Query</h3>
+    <form method="post" action="{{ url_for('admin.admin_dashboard') }}">
+        <textarea name="query" rows="4" cols="50" placeholder="Enter SQL query here"></textarea><br>
+        <button type="submit">Execute</button>
+    </form>
+    {% if query_executed %}
+        <h4>Executed Query:</h4>
+        <p>{{ query_executed }}</p>
+    {% endif %}
+    {% if result %}
+        <h4>Results:</h4>
+        <table>
+            <tr>
+            {% for column in result[0].keys() %}
+                <th>{{ column }}</th>
+            {% endfor %}
+            </tr>
+            {% for row in result %}
+            <tr>
+                {% for column in row.keys() %}
+                <td>{{ row[column] }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+</div>
+{% endblock %}

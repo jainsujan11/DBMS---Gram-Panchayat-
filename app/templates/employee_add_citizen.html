@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+    <h2>Add Citizen Record</h2>
+    <form method="post" action="{{ url_for('employee.employee_add_citizen') }}">
+        <label>Name:</label><br>
+        <input type="text" name="name" required><br>
+        <label>Gender:</label><br>
+        <select name="gender">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select><br>
+        <label>Date of Birth:</label><br>
+        <input type="date" name="dob" required><br>
+        <label>Educational Qualification:</label><br>
+        <input type="text" name="educational_qualification" required><br>
+        <label>Select Household:</label><br>
+        <select name="household_id">
+            {% for h in households %}
+                <option value="{{ h.household_id }}">{{ h.address }} (Income: {{ h.income }})</option>
+            {% endfor %}
+        </select><br><br>
+        <button type="submit">Add Citizen</button>
+    </form>
+</div>
+{% endblock %}

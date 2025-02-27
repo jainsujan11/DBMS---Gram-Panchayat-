@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+    <h2>Employee Add/Modify</h2>
+    <ul>
+        <li><a href="{{ url_for('employee.employee_add_citizen') }}">Add Citizen</a></li>
+        <li><a href="{{ url_for('employee.employee_add_land') }}">Add Land Record</a></li>
+        <li><a href="{{ url_for('employee.employee_add_asset') }}">Add Asset</a></li>
+        <!-- You can add more options for schemes, vaccinations, etc. -->
+    </ul>
+</div>
+{% endblock %}

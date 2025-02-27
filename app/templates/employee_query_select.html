@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+    <h2>Employee Query - Select Category</h2>
+    <form method="post" action="{{ url_for('employee.employee_query_select') }}">
+        <label>Select Query Category:</label>
+        <select name="query_category">
+            <option value="citizen">Citizen Queries</option>
+            <option value="asset">Asset Queries</option>
+            <option value="land">Land Queries</option>
+        </select>
+        <button type="submit">Proceed</button>
+    </form>
+</div>
+{% endblock %}

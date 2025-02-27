@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+    <h2>Citizen Dashboard</h2>
+    <h3>Your Information</h3>
+    <p>Name: {{ citizen.name }}</p>
+    <p>Gender: {{ citizen.gender }}</p>
+    <p>Date of Birth: {{ citizen.dob }}</p>
+    <p>Educational Qualification: {{ citizen.educational_qualification }}</p>
+    <h3>Land Records</h3>
+    {% if lands %}
+    <table>
+        <tr>
+            <th>Land ID</th>
+            <th>Area (acres)</th>
+            <th>Crop Type</th>
+        </tr>
+        {% for land in lands %}
+        <tr>
+            <td>{{ land.land_id }}</td>
+            <td>{{ land.area_acres }}</td>
+            <td>{{ land.crop_type }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>No land records available.</p>
+    {% endif %}
+    <h3>Vaccinations</h3>
+    {% if vaccinations %}
+    <table>
+        <tr>
+            <th>Vaccination ID</th>
+            <th>Vaccine Type</th>
+            <th>Date Administered</th>
+        </tr>
+        {% for vac in vaccinations %}
+        <tr>
+            <td>{{ vac.vaccination_id }}</td>
+            <td>{{ vac.vaccine_type }}</td>
+            <td>{{ vac.date_administered }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>No vaccination records available.</p>
+    {% endif %}
+    <h3>Scheme Enrollments</h3>
+    {% if enrollments %}
+    <table>
+        <tr>
+            <th>Enrollment ID</th>
+            <th>Scheme ID</th>
+            <th>Enrollment Date</th>
+        </tr>
+        {% for enroll in enrollments %}
+        <tr>
+            <td>{{ enroll.enrollment_id }}</td>
+            <td>{{ enroll.scheme_id }}</td>
+            <td>{{ enroll.enrollment_date }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>No scheme enrollments available.</p>
+    {% endif %}
+</div>
+{% endblock %}

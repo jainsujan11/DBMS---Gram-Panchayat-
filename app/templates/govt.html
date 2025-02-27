@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+    <h2>Government Monitor Dashboard</h2>
+    <h3>Default Statistics</h3>
+    <p>Total rice cultivated (acres): {{ stats.total_rice if stats.total_rice else 0 }}</p>
+    <p>Total number of citizens: {{ stats.total_citizens }}</p>
+</div>
+{% endblock %}

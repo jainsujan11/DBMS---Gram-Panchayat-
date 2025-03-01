@@ -45,33 +45,58 @@ def employee_query_form(query_type):
             is_employee = request.form.get('is_employee')
             vacc_year = request.form.get('vaccination_year')
             
-            query = "SELECT * FROM v_citizen WHERE 1=1"
+            query_select="select citizen_id,name,gender,dob,household_id,educational_qualification"
+            query_from="from Citizen "
+            query_where="where 1=1"
+            query_group_by="group by citizen_id,name,gender,dob,household_id,educational_qualification"
+            query_having="having 1=1"
+            group_by=0
+
+
             params = []
             if name:
-                query += " AND name ILIKE %s"
+                query_where+=" AND name ILIKE %s"
                 params.append('%' + name + '%')
             if gender and gender != "Any":
-                query += " AND gender = %s"
+                query_where += " AND gender = %s"
                 params.append(gender)
             if edu:
-                query += " AND educational_qualification ILIKE %s"
+                # query += " AND educational_qualification ILIKE %s"
+                query_where += " AND educational_qualification ILIKE %s"
                 params.append('%' + edu + '%')
             if min_land:
-                query += " AND area_acres >= %s"
+                query_select+=",sum(area_acres)"
+                query_from+=" natural join land_records using (citizen_id)"
+                query_having+=" and sum(area_acres) >= %s"
                 params.append(min_land)
+                group_by=1
             if max_income:
-                query += " AND income <= %s"
+                query_select+=",income"
+                query_from+=" natural join households using (household_id)"
+                query_having+=" and income <= %s"
                 params.append(max_income)
+                group_by=1
             if dob:
-                query += " AND dob = %s"
+                query_where += " AND dob = %s"
                 params.append(dob)
             if is_pradhan == 'on':
-                query += " AND panchayat_role = 'Pradhan'"
+                query_from  +=" natural join panchayat_employees using (citizen_id)"
+                query_where += " AND role = 'Pradhan'"
             if is_employee == 'on':
-                query += " AND panchayat_role IS NOT NULL"
+                if is_pradhan != 'on':
+                    query_select += ",role"
+                    query_from += " natural join panchayat_employees using (citizen_id)"
             if vacc_year:
-                query += " AND EXTRACT(YEAR FROM date_administered) = %s"
+                # query += " AND EXTRACT(YEAR FROM date_administered) = %s"
+                query_select+=",date_adminstered"
+                query_from += "natural join vaccinations using (citizen_id)"
+                query_where += " AND date_administered >= '%s.01.01' AND date_administered < '%s.01.01'"
                 params.append(vacc_year)
+                params.append(vacc_year)
+
+            query=query_select+"\n"+query_from+"\n"+query_where
+            if(group_by):
+                query+="\n"+query_group_by+"\n"+query_having
             cur.execute(query, tuple(params))
             results = cur.fetchall()
         

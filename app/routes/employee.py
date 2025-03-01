@@ -44,7 +44,6 @@ def employee_query_form(query_type):
             is_pradhan = request.form.get('is_pradhan')
             is_employee = request.form.get('is_employee')
             vacc_year = request.form.get('vaccination_year')
-            
             query_select="select citizen_id,name,gender,dob,household_id,educational_qualification"
             query_from="from citizens "
             query_where="where 1=1"
@@ -53,32 +52,35 @@ def employee_query_form(query_type):
             group_by=0
 
 
+            params_where = []
+            params_having = []
             params = []
             if name:
                 query_where+=" AND name ILIKE %s"
-                params.append('%' + name + '%')
+                params_where.append('%' + name + '%')
             if gender and gender != "Any":
                 query_where += " AND gender = %s"
-                params.append(gender)
+                params_where.append(gender)
             if edu:
                 # query += " AND educational_qualification ILIKE %s"
                 query_where += " AND educational_qualification ILIKE %s"
-                params.append('%' + edu + '%')
+                params_where.append('%' + edu + '%')
             if min_land:
                 query_select+=",sum(area_acres)"
                 query_from+=" join land_records using (citizen_id)"
                 query_having+=" and sum(area_acres) >= %s"
-                params.append(min_land)
+                params_having.append(min_land)
                 group_by=1
             if max_income:
                 query_select+=",income"
                 query_from+="  join households using (household_id)"
                 query_having+=" and income <= %s"
-                params.append(max_income)
+                query_group_by += ",income"
+                params_having.append(max_income)
                 group_by=1
             if dob:
-                query_where += " AND dob = %s"
-                params.append(dob)
+                query_where += " AND dob > %s"
+                params_where.append(dob)
             if is_pradhan == 'on':
                 query_from  +="  join panchayat_employees using (citizen_id)"
                 query_where += " AND role = 'Pradhan'"
@@ -86,18 +88,20 @@ def employee_query_form(query_type):
                 if is_pradhan != 'on':
                     query_select += ",role"
                     query_from += "  join panchayat_employees using (citizen_id)"
+                    query_group_by += ",role"
             if vacc_year:
                 # query += " AND EXTRACT(YEAR FROM date_administered) = %s"
-                query_select+=",date_adminstered"
+                query_select+=",date_administered"
                 query_from += " join vaccinations using (citizen_id)"
-                query_where += " AND date_administered >= '%s-01-01' AND date_administered < '%s-01-01'"
-                print(vacc_year)
-                params.append(vacc_year)
-                params.append(vacc_year)
+                query_where += " AND date_administered >= %s AND date_administered <= %s"
+                query_group_by+=" ,date_administered"
+                params_where.append(vacc_year + "-01-01")
+                params_where.append(vacc_year + "-12-31")
 
             query=query_select+"\n"+query_from+"\n"+query_where
             if(group_by):
                 query+="\n"+query_group_by+"\n"+query_having
+            params = params_where+params_having
             cur.execute(query, tuple(params))
             results = cur.fetchall()
         
@@ -128,8 +132,12 @@ def employee_query_form(query_type):
                 params.append('%' + crop + '%')
             cur.execute(query, tuple(params))
             results = cur.fetchall()
+
+        # print query in console in good format
+        print(cur.mogrify(query, tuple(params)))
+
         conn.close()
-        return render_template('employee_query_form.html', query_type=query_type, results=results)
+        return render_template('employee_query_result.html', query_type=query_type, results=results)
     return render_template('employee_query_form.html', query_type=query_type, results=results)
 
 # -----------------------------

@@ -34,7 +34,7 @@
                 <label>Select Household:</label><br>
                 <select name="existing_household">
                     {% for h in households %}
-                        <option value="{{ h.household_id }}">{{ h.address }} (Income: {{ h.income }})</option>
+                        <option value="{{ h.household_id }}">{{ h.household_id }} - {{ h.address }}</option>
                     {% endfor %}
                 </select><br>
             </div>

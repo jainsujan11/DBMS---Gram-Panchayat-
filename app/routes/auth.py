@@ -2,6 +2,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from connect import get_db, close_db  # Use correct import
+import psycopg2
+import psycopg2.extras
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -86,10 +88,12 @@ def signup():
 
     # Fetch existing households for dropdown
     conn = get_db()
-    cur = conn.cursor()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cur.execute("SELECT household_id, address FROM households")
     households = cur.fetchall()
     cur.close()
+    # make households to dictionary
+
     close_db()
 
     return render_template('signup.html', households=households)

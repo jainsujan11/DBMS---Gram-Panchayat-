@@ -43,6 +43,7 @@ def employee_query_form(query_type):
             dob = request.form.get('dob')
             is_pradhan = request.form.get('is_pradhan')
             is_employee = request.form.get('is_employee')
+            is_household = request.form.get('is_household')
             vacc_year = request.form.get('vaccination_year')
             query_select="select citizen_id,name,gender,dob,household_id,educational_qualification"
             query_from="from citizens "
@@ -97,6 +98,10 @@ def employee_query_form(query_type):
                 query_group_by+=" ,date_administered"
                 params_where.append(vacc_year + "-01-01")
                 params_where.append(vacc_year + "-12-31")
+            if is_household == 'on':
+                query_from += " join citizens as C2(_citizen_id,_name,_gender,_dob,household_id,_educational_qualification) using (household_id)"
+                query_where += " AND household_id = C2.household_id"
+                query_select += ",C2._citizen_id as family_member_id, C2._name as family_member_name"
 
             query=query_select+"\n"+query_from+"\n"+query_where
             if(group_by):

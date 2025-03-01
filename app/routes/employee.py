@@ -46,7 +46,7 @@ def employee_query_form(query_type):
             vacc_year = request.form.get('vaccination_year')
             
             query_select="select citizen_id,name,gender,dob,household_id,educational_qualification"
-            query_from="from Citizen "
+            query_from="from citizens "
             query_where="where 1=1"
             query_group_by="group by citizen_id,name,gender,dob,household_id,educational_qualification"
             query_having="having 1=1"
@@ -66,13 +66,13 @@ def employee_query_form(query_type):
                 params.append('%' + edu + '%')
             if min_land:
                 query_select+=",sum(area_acres)"
-                query_from+=" natural join land_records using (citizen_id)"
+                query_from+=" join land_records using (citizen_id)"
                 query_having+=" and sum(area_acres) >= %s"
                 params.append(min_land)
                 group_by=1
             if max_income:
                 query_select+=",income"
-                query_from+=" natural join households using (household_id)"
+                query_from+="  join households using (household_id)"
                 query_having+=" and income <= %s"
                 params.append(max_income)
                 group_by=1
@@ -80,17 +80,18 @@ def employee_query_form(query_type):
                 query_where += " AND dob = %s"
                 params.append(dob)
             if is_pradhan == 'on':
-                query_from  +=" natural join panchayat_employees using (citizen_id)"
+                query_from  +="  join panchayat_employees using (citizen_id)"
                 query_where += " AND role = 'Pradhan'"
             if is_employee == 'on':
                 if is_pradhan != 'on':
                     query_select += ",role"
-                    query_from += " natural join panchayat_employees using (citizen_id)"
+                    query_from += "  join panchayat_employees using (citizen_id)"
             if vacc_year:
                 # query += " AND EXTRACT(YEAR FROM date_administered) = %s"
                 query_select+=",date_adminstered"
-                query_from += "natural join vaccinations using (citizen_id)"
-                query_where += " AND date_administered >= '%s.01.01' AND date_administered < '%s.01.01'"
+                query_from += " join vaccinations using (citizen_id)"
+                query_where += " AND date_administered >= '%s-01-01' AND date_administered < '%s-01-01'"
+                print(vacc_year)
                 params.append(vacc_year)
                 params.append(vacc_year)
 

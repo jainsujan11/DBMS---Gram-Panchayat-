@@ -64,5 +64,33 @@
     {% else %}
     <p>No scheme enrollments available.</p>
     {% endif %}
+    <body>
+        <h3>Family Members</h3>
+        <table style="width: 100%;text-align: left">
+            <thead>
+                <tr>
+                    <th>{{"Citizen_id"}}</th>
+                    <th>{{"Name"}}</th>
+                    <th>{{"Gender"}}</th>
+                    <th>{{"Educational Qualification"}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if household_members %}
+                    {% for row in household_members %}
+                        <tr>
+                            {% for value in row %}
+                                <td>{{ value }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="{{ column_names|length }}">No results found.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </body>
 </div>
 {% endblock %}

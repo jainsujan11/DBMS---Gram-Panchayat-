@@ -223,3 +223,68 @@ def employee_add_asset():
         flash("Asset record added successfully.")
         return redirect(url_for('employee.employee_add_select'))
     return render_template('employee_add_asset.html')
+
+
+@employee_bp.route('/modify_citizen')
+def employee_modify_citizen():
+    # Get citizen_id from the query parameters
+    citizen_id = request.args.get('citizen_id')
+
+    if not citizen_id:
+        flash("Citizen ID is required", "error")
+        return redirect(url_for('employee.employee_dashboard'))
+
+    # Fetch citizen details from the database
+    conn = get_db()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur.execute("SELECT * FROM citizens WHERE citizen_id = %s", (citizen_id,))
+    citizen = cur.fetchone()
+    cur.close()
+    close_db()
+
+    if not citizen:
+        flash("Citizen not found", "error")
+        return redirect(url_for('employee.employee_dashboard'))
+
+    # Pass citizen details to the template
+    return render_template('modify_citizen.html', citizen=citizen)
+
+
+@employee_bp.route('/update_citizen/<int:citizen_id>', methods=['POST'])
+def update_citizen(citizen_id):
+    # Get form data
+    name = request.form.get('name')
+    gender = request.form.get('gender')
+    dob = request.form.get('dob')
+    household_id = request.form.get('household_id')
+    educational_qualification = request.form.get('educational_qualification')
+
+    # Validate form data
+    if not all([name, gender, dob, household_id, educational_qualification]):
+        flash("All fields are required", "error")
+        return redirect(url_for('employee.employee_modify_citizen', citizen_id=citizen_id))
+
+    # Update citizen details in the database
+    conn = get_db()
+    cur = conn.cursor()
+    try:
+        cur.execute("""
+            UPDATE citizens
+            SET name = %s,
+                gender = %s,
+                dob = %s,
+                household_id = %s,
+                educational_qualification = %s
+            WHERE citizen_id = %s
+        """, (name, gender, dob, household_id, educational_qualification, citizen_id))
+        conn.commit()
+        flash("Citizen details updated successfully", "success")
+    except Exception as e:
+        conn.rollback()
+        flash(f"An error occurred: {str(e)}", "error")
+    finally:
+        cur.close()
+        close_db()
+
+    # Redirect back to the modify page
+    return redirect(url_for('employee.employee_modify_citizen', citizen_id=citizen_id))

@@ -7,6 +7,7 @@
     <p>Gender: {{ citizen.gender }}</p>
     <p>Date of Birth: {{ citizen.dob }}</p>
     <p>Educational Qualification: {{ citizen.educational_qualification }}</p>
+    <p>Home ID: {{ citizen.household_id }}</p>
     <h3>Land Records</h3>
     {% if lands %}
     <table>
@@ -64,5 +65,11 @@
     {% else %}
     <p>No scheme enrollments available.</p>
     {% endif %}
+    <div class="dashboard">
+        <h3>Household Members</h3>
+        <a href="{{ url_for('citizen.view_household_members', household_id=citizen.household_id, citizen_id = citizen.citizen_id) }}">
+            <button>View Household Members</button>
+        </a>
+    </div>
 </div>
 {% endblock %}

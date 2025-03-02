@@ -45,24 +45,29 @@ def add_citizen_employee():
         return redirect(url_for('admin.admin_dashboard'))
 
     conn = get_db()
-    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur = conn.cursor()
 
-    try:
-        # Use INSERT ... ON CONFLICT to update or insert
-        cur.execute("""
-            INSERT INTO panchayat_employees (citizen_id, role)
-            VALUES (%s, %s)""", (citizen_id, employee_type))
-        conn.commit()
+    cur.execute("""SELECT user_type from users where citizen_id=%s""",(citizen_id))
+    results = cur.fetchall()
 
-        flash(f"Citizen ID {citizen_id} has been added/updated with Employee Type {employee_type}", "success")
-    except Exception as e:
-        conn.rollback()
-        flash(f"An error occurred: {str(e)}", "error")
-    finally:
-        cur.close()
-        close_db()
+    if(len(results)==0):
+        flash(f"No citizen with citizen_id={citizen_id}")
+    else:  
+        current_type=results[0][0]
+        if(current_type==employee_type):
+            flash(f"Citizen {citizen_id} is already {current_type}")
+        else:
+            cur.execute("""UPDATE users set user_type=%s where citizen_id=%s""",(employee_type,citizen_id))
+            conn.commit()
+            flash(f"Changed user_type of citizen_id {citizen_id} from {current_type} to {employee_type}")
+            if(current_type=='citizen'):
+                cur.execute("""INSERT INTO panchayat_employees(citizen_id,role) values (%s,%s)""",(citizen_id,employee_type))
+            else:
+                cur.execute("""UPDATE panchayat_employees set role=%s where citizen_id=%s""",(employee_type,citizen_id))
+            conn.commit()
+    cur.close()
+    close_db()
 
-    # Redirect back to the admin dashboard
     return redirect(url_for('admin.admin_dashboard'))
 
 @admin_bp.route('/remove_citizen', methods=['POST'])
@@ -84,8 +89,9 @@ def remove_citizen():
     try:
         # Example: Delete the citizen from the citizens table
         cur.execute("DELETE FROM panchayat_employees WHERE citizen_id = %s", (citizen_id,))
+        flash(f"Citizen with ID {citizen_id} has been removed successfully", "success")
+        cur.execute("UPDATE users set user_type='citizen' where citizen_id=%s",(citizen_id,))
         conn.commit()
-        flash(f"Employee with ID {citizen_id} has been removed successfully", "success")
     except Exception as e:
         conn.rollback()
         flash(f"An error occurred: {str(e)}", "error")

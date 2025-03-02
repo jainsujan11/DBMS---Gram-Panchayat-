@@ -1,9 +1,22 @@
 {% extends "base.html" %}
+
 {% block content %}
 <div class="dashboard">
     <h2>Government Monitor Dashboard</h2>
-    <h3>Default Statistics</h3>
-    <p>Total rice cultivated (acres): {{ stats.total_rice if stats.total_rice else 0 }}</p>
-    <p>Total number of citizens: {{ stats.total_citizens }}</p>
+    
+    <div class="action-buttons">
+        <form action="{{ url_for('govt.govt_add_scheme') }}" method="get">
+            <button type="submit" >Add welfare scheme</button>
+        </form>
+        <form action="{{ url_for('govt.govt_print_statistics') }}" method="post" style="display:inline;">
+            <button type="submit" name="which_query" value="Birth_Rate">Birth Rate</button>
+        </form>
+        <form action="{{ url_for('govt.govt_print_statistics') }}" method="post" style="display:inline;">
+            <button type="submit"name="which_query" value="Literacy_Rate">Literacy Rate</button>
+        </form>
+        <form action="{{ url_for('govt.govt_print_statistics') }}" method="post" style="display:inline;">
+            <button type="submit" name="which_query" value="Assets">Assets</button>
+        </form>
+    </div>
 </div>
 {% endblock %}

@@ -27,6 +27,11 @@ def citizen_dashboard():
     cur.execute("SELECT * FROM scheme_enrollments WHERE citizen_id = %s", (citizen_id,))
     enrollments = cur.fetchall()
 
+    cur.execute("SELECT C2.citizen_id,C2.name,C2.gender,C2.educational_qualification FROM citizens as C1,citizens as C2 WHERE C1.citizen_id=%s and C1.household_id=C2.household_id",(citizen_id,))
+    household_members=cur.fetchall()
+
+    print(household_members)
+
     cur.close()
     close_db()
 

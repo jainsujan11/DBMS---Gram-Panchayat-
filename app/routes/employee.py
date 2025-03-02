@@ -94,10 +94,9 @@ def employee_query_form(query_type):
                 # query += " AND EXTRACT(YEAR FROM date_administered) = %s"
                 query_select+=",date_administered"
                 query_from += " join vaccinations using (citizen_id)"
-                query_where += " AND date_administered >= %s AND date_administered <= %s"
+                query_where += " AND EXTRACT(YEAR FROM installation_date) = %s"
                 query_group_by+=" ,date_administered"
-                params_where.append(vacc_year + "-01-01")
-                params_where.append(vacc_year + "-12-31")
+                params_where.append(vacc_year)
             if is_household == 'on':
                 query_from += " join citizens as C2(_citizen_id,_name,_gender,_dob,household_id,_educational_qualification) using (household_id)"
                 query_where += " AND household_id = C2.household_id"

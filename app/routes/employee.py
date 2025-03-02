@@ -32,6 +32,7 @@ def employee_query_form(query_type):
         flash("Unauthorized access")
         return redirect(url_for('auth.login'))
     results = None
+    column_names = None
     if request.method == 'POST':
         conn = get_db()
         cur = conn.cursor()
@@ -109,6 +110,7 @@ def employee_query_form(query_type):
             params = params_where+params_having
             cur.execute(query, tuple(params))
             results = cur.fetchall()
+            column_names = [desc[0] for desc in cur.description]
         
         elif query_type == 'asset':
             locality = request.form.get('locality')
@@ -127,6 +129,7 @@ def employee_query_form(query_type):
                 params.append(asset_type)
             cur.execute(query, tuple(params))
             results = cur.fetchall()
+            column_names = [desc[0] for desc in cur.description]
         
         elif query_type == 'land':
             crop = request.form.get('crop')
@@ -137,13 +140,14 @@ def employee_query_form(query_type):
                 params.append('%' + crop + '%')
             cur.execute(query, tuple(params))
             results = cur.fetchall()
+            column_names = [desc[0] for desc in cur.description]
 
         # print query in console in good format
         print(cur.mogrify(query, tuple(params)))
 
         conn.close()
-        return render_template('employee_query_result.html', query_type=query_type, results=results)
-    return render_template('employee_query_form.html', query_type=query_type, results=results)
+        return render_template('employee_query_result.html', query_type=query_type, results=results,column_names=column_names)
+    return render_template('employee_query_form.html', query_type=query_type, results=results,column_names=column_names)
 
 # -----------------------------
 # Add/Modify Module

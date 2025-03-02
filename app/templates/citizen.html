@@ -7,6 +7,7 @@
     <p>Gender: {{ citizen.gender }}</p>
     <p>Date of Birth: {{ citizen.dob }}</p>
     <p>Educational Qualification: {{ citizen.educational_qualification }}</p>
+    <p>Home ID: {{ citizen.household_id }}</p>
     <h3>Land Records</h3>
     {% if lands %}
     <table>
@@ -64,34 +65,12 @@
     {% else %}
     <p>No scheme enrollments available.</p>
     {% endif %}
-    <h3>Family Members</h3>
-    <table style="width: 100%; text-align: left">
-        <thead>
-            <tr>
-                <th>Citizen_id</th>
-                <th>Name</th>
-                <th>Gender</th>
-                <th>Educational Qualification</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if household_members %}
-                {% for row in household_members %}
-                    <tr>
-                        {% for value in row %}
-                            <td>{{ value }}</td>
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-            {% else %}
-                <tr>
-                    <td colspan="{{ column_names|length }}">No results found.</td>
-                </tr>
-            {% endif %}
-        </tbody>
-    </table>
-
-    <!-- Buttons Container -->
+    <div class="dashboard">
+        <h3>Household Members</h3>
+        <a href="{{ url_for('citizen.view_household_members', household_id=citizen.household_id, citizen_id = citizen.citizen_id) }}">
+            <button>View Household Members</button>
+        </a>
+    </div>
     <div style="margin-top: 20px; display: flex; gap: 10px;">
         <form action="{{ url_for('employee.employee_query_form' , query_type='asset')}}" method="post" style="flex: 1;" name="query_type" value="asset">
             <button type="submit" style="width: 100%; padding: 15px; font-size: 16px; font-weight: bold; border: 2px solid #000;" name="query_type" value="asset">Assets</button>

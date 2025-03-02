@@ -1,5 +1,5 @@
 # app/citizen.py
-from flask import Blueprint, render_template, session, flash, redirect, url_for
+from flask import Blueprint, render_template, session, flash, redirect, url_for, request
 import psycopg2
 import psycopg2.extras
 from connect import get_db, close_db  # Fix import
@@ -35,6 +35,33 @@ def citizen_dashboard():
     cur.close()
     close_db()
 
-    #select * from households where income >= (select avg(income) from households);
+    return render_template('citizen.html', citizen=citizen, lands=lands, vaccinations=vaccinations, enrollments=enrollments)
 
-    return render_template('citizen.html', citizen=citizen, lands=lands, vaccinations=vaccinations, enrollments=enrollments,household_members=household_members)
+
+
+@citizen_bp.route('/view_household_members')
+def view_household_members():
+    household_id = request.args.get('household_id')
+    citizen_id = request.args.get('citizen_id')
+    query_select="select citizen_id,name,gender,dob,household_id,educational_qualification"
+    query_from="from citizens "
+    query_where="where citizen_id = %s"
+    query_group_by="group by citizen_id,name,gender,dob,household_id,educational_qualification"
+    query_having="having 1=1"
+    group_by=0
+    query_from += " join citizens as C2(_citizen_id,_name,_gender,_dob,household_id,_educational_qualification) using (household_id)"
+    query_where += " AND %s = C2.household_id"
+    query_select += ",C2._citizen_id as family_member_id, C2._name as family_member_name"
+    query=query_select+"\n"+query_from+"\n"+query_where
+    if(group_by):
+        query+="\n"+query_group_by+"\n"+query_having
+    params = []
+    params.append(citizen_id)
+    params.append(household_id)
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(query, params)
+    results = cur.fetchall()
+    conn.close()
+    return render_template('employee_query_result.html', query_type="", results=results)
+    pass

@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from werkzeug.security import generate_password_hash, check_password_hash
 from connect import get_db, close_db
 import psycopg2
 import psycopg2.extras
@@ -7,7 +8,7 @@ employee_bp = Blueprint('employee', __name__)
 
 @employee_bp.route('/')
 def employee_dashboard():
-    if 'user_type' not in session or session['user_type'] != 'employee':
+    if 'user_type' not in session or (session['user_type'] != 'employee' and session['user_type'] != 'citizen'):
         flash("Unauthorized access")
         return redirect(url_for('auth.login'))
     return render_template('employee_dashboard.html')
@@ -27,7 +28,7 @@ def employee_query_select():
 
 @employee_bp.route('/query/<query_type>', methods=['GET', 'POST'])
 def employee_query_form(query_type):
-    if 'user_type' not in session or (session['user_type'] != 'employee' and session['user_type']!='citizen'):
+    if 'user_type' not in session or (session['user_type'] != 'employee' and session['user_type'] != 'citizen'):
         flash("Unauthorized access")
         return redirect(url_for('auth.login'))
     results = None
@@ -160,6 +161,9 @@ def employee_add_citizen():
         flash("Unauthorized access")
         return redirect(url_for('auth.login'))
     if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        hashed_password = generate_password_hash(password)
         name = request.form.get('name')
         gender = request.form.get('gender')
         dob = request.form.get('dob')
@@ -167,8 +171,15 @@ def employee_add_citizen():
         household_id = request.form.get('household_id')
         conn = get_db()
         cur = conn.cursor()
-        cur.execute("INSERT INTO citizens (name, gender, dob, household_id, educational_qualification) VALUES (%s, %s, %s, %s, %s)",
-                    (name, gender, dob, household_id, educational_qualification))
+        cur.execute("INSERT INTO citizens (name, gender, dob, household_id, educational_qualification) VALUES (%s, %s, %s, %s, %s)\
+                    RETURNING citizen_id",(name, gender, dob, household_id, educational_qualification))
+        citizen_id = cur.fetchone()[0]  # Get the newly inserted citizen_id
+
+        # Insert into users table using form values
+        cur.execute(
+            "INSERT INTO users (citizen_id, username, password, user_type) VALUES (%s, %s,%s, %s)",
+            (citizen_id, username, hashed_password, "citizen")
+        )
         conn.commit()
         conn.close()
         flash("Citizen record added successfully.")
@@ -222,3 +233,127 @@ def employee_add_asset():
         flash("Asset record added successfully.")
         return redirect(url_for('employee.employee_add_select'))
     return render_template('employee_add_asset.html')
+
+
+@employee_bp.route('/modify_citizen')
+def employee_modify_citizen():
+    # Get citizen_id from the query parameters
+    citizen_id = request.args.get('citizen_id')
+
+    if not citizen_id:
+        flash("Citizen ID is required", "error")
+        return redirect(url_for('employee.employee_dashboard'))
+
+    # Fetch citizen details from the database
+    conn = get_db()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur.execute("SELECT * FROM citizens WHERE citizen_id = %s", (citizen_id,))
+    citizen = cur.fetchone()
+    cur.close()
+    close_db()
+
+    if not citizen:
+        flash("Citizen not found", "error")
+        return redirect(url_for('employee.employee_dashboard'))
+
+    # Pass citizen details to the template
+    return render_template('modify_citizen.html', citizen=citizen)
+
+
+@employee_bp.route('/update_citizen/<int:citizen_id>', methods=['POST'])
+def update_citizen(citizen_id):
+    # Get form data
+    name = request.form.get('name')
+    gender = request.form.get('gender')
+    dob = request.form.get('dob')
+    household_id = request.form.get('household_id')
+    educational_qualification = request.form.get('educational_qualification')
+
+    # Validate form data
+    if not all([name, gender, dob, household_id, educational_qualification]):
+        flash("All fields are required", "error")
+        return redirect(url_for('employee.employee_modify_citizen', citizen_id=citizen_id))
+
+    # Update citizen details in the database
+    conn = get_db()
+    cur = conn.cursor()
+    try:
+        cur.execute("""
+            UPDATE citizens
+            SET name = %s,
+                gender = %s,
+                dob = %s,
+                household_id = %s,
+                educational_qualification = %s
+            WHERE citizen_id = %s
+        """, (name, gender, dob, household_id, educational_qualification, citizen_id))
+        conn.commit()
+        flash("Citizen details updated successfully", "success")
+    except Exception as e:
+        conn.rollback()
+        flash(f"An error occurred: {str(e)}", "error")
+    finally:
+        cur.close()
+        close_db()
+
+    # Redirect back to the modify page
+    return redirect(url_for('employee.employee_modify_citizen', citizen_id=citizen_id))
+
+
+@employee_bp.route('/add_citizen_to_scheme', methods=['GET'])
+def employee_add_citizen_to_scheme():
+    if 'user_type' not in session or session['user_type'] != 'employee':
+        flash("Unauthorized access")
+        return redirect(url_for('auth.login'))
+
+    # Fetch all citizen IDs from the citizens table
+    conn = get_db()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur.execute("SELECT citizen_id FROM citizens")
+    citizens = cur.fetchall()
+
+    # Fetch all scheme IDs from the welfare_schemes table
+    cur.execute("SELECT scheme_id FROM welfare_schemes")
+    schemes = cur.fetchall()
+
+    cur.close()
+    close_db()
+
+    # Render the HTML template with the fetched data
+    return render_template('add_citizen_to_scheme.html', citizens=citizens, schemes=schemes)
+
+@employee_bp.route('/submit_citizen_to_scheme', methods=['POST'])
+def submit_citizen_to_scheme():
+    if 'user_type' not in session or session['user_type'] != 'employee':
+        flash("Unauthorized access")
+        return redirect(url_for('auth.login'))
+
+    # Get form data
+    citizen_id = request.form.get('citizen_id')
+    scheme_id = request.form.get('scheme_id')
+    date_of_enrollment = request.form.get('date_of_enrollment')
+
+    # Validate form data
+    if not all([citizen_id, scheme_id, date_of_enrollment]):
+        flash("All fields are required", "error")
+        return redirect(url_for('employee.employee_add_citizen_to_scheme'))
+
+    # Insert data into the database
+    conn = get_db()
+    cur = conn.cursor()
+    try:
+        cur.execute("""
+            INSERT INTO scheme_enrollments (citizen_id, scheme_id, enrollment_date)
+            VALUES (%s, %s, %s)
+        """, (citizen_id, scheme_id, date_of_enrollment))
+        conn.commit()
+        flash("Citizen added to scheme successfully", "success")
+    except Exception as e:
+        conn.rollback()
+        flash(f"An error occurred: {str(e)}", "error")
+    finally:
+        cur.close()
+        close_db()
+
+    # Redirect back to the add citizen to scheme page
+    return redirect(url_for('employee.employee_add_citizen_to_scheme'))

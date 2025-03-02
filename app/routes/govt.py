@@ -57,8 +57,12 @@ def govt_print_statistics():
     elif(which_query=='Literacy_Rate'):
         # query="select * from literacy_rate" #select * from citizens where educational_qualification != 'Secondary';
         query="select * from citizens where educational_qualification != 'Secondary';"
-    else:
+    elif(which_query == 'Assets'):
         query="select * from assets"
+    elif(which_query == 'Poverty Line'):
+        query="select 'BELOW POVERTY LINE',count(*) as count from households where income < (select avg(income) from households)" 
+    elif(which_query =='Scheme Enrollments'):
+        query="select scheme_id,count(*) as count from scheme_enrollments group by scheme_id"
 
     conn = get_db()
     cur = conn.cursor()

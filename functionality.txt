@@ -1,0 +1,54 @@
+system admin 
+--- 
+give a blank box to write sql 
+query  
+
+
+govt 
+--- 
+add new scheme
+add new vaccine  
+ask for birth rate {male and female}
+ask for literacy rate {edu qual >= 10th}
+ask for all the assets the village has 
+
+
+panchayat 
+-- add/modify 
+    register a user 
+    add land record {
+        crop 
+    }
+    add asset {
+        locality
+        year 
+        type 
+    }
+    modify citizen data new button
+
+-- query 
+has these filters so use any of them 
+land
+gender
+income 
+DOB 
+edu qual          
+bool pradhan 
+bool panch_emp
+household flag
+vaccination yr
+these are used to answer all 9 queries 
+
+
+citizen 
+-- 
+name 
+income 
+land 
+education qual  
+vaccination 
+add buttons of land records and 
+assets like employee.py 
+give a button which 
+displays its own household id
+and all details of household members

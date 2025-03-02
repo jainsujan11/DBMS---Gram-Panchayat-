@@ -3,6 +3,10 @@
 <div class="dashboard">
     <h2>Add Citizen Record</h2>
     <form method="post" action="{{ url_for('employee.employee_add_citizen') }}">
+        <label>Username:</label><br>
+        <input type="text" name="username" required><br>
+        <label>Password:</label><br>
+        <input type="password" name="password" required><br>
         <label>Name:</label><br>
         <input type="text" name="name" required><br>
         <label>Gender:</label><br>

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+    <h2>Modify Citizen</h2>
+    <form action="{{ url_for('employee.update_citizen', citizen_id=citizen.citizen_id) }}" method="POST">
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" value="{{ citizen.name }}" required>
+        </div>
+        <div>
+            <label for="gender">Gender:</label>
+            <input type="text" id="gender" name="gender" value="{{ citizen.gender }}" required>
+        </div>
+        <div>
+            <label for="dob">Date of Birth:</label>
+            <input type="text" id="dob" name="dob" value="{{ citizen.dob }}" required>
+        </div>
+        <div>
+            <label for="household_id">Household ID:</label>
+            <input type="number" id="household_id" name="household_id" value="{{ citizen.household_id }}" required>
+        </div>
+        <div>
+            <label for="educational_qualification">Educational Qualification:</label>
+            <input type="text" id="educational_qualification" name="educational_qualification" value="{{ citizen.educational_qualification }}" required>
+        </div>
+        <button type="submit">Update</button>
+    </form>
+</div>
+{% endblock %}

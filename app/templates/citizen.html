@@ -65,19 +65,18 @@
     {% else %}
     <p>No scheme enrollments available.</p>
     {% endif %}
-    <div class="dashboard">
-        <h3>Household Members</h3>
-        <a href="{{ url_for('citizen.view_household_members', household_id=citizen.household_id, citizen_id = citizen.citizen_id) }}">
-            <button>View Household Members</button>
-        </a>
-    </div>
     <div style="margin-top: 20px; display: flex; gap: 10px;">
-        <form action="{{ url_for('employee.employee_query_form' , query_type='asset')}}" method="post" style="flex: 1;" name="query_type" value="asset">
-            <button type="submit" style="width: 100%; padding: 15px; font-size: 16px; font-weight: bold; border: 2px solid #000;" name="query_type" value="asset">Assets</button>
+        <a href="{{ url_for('citizen.view_household_members', household_id=citizen.household_id, citizen_id=citizen.citizen_id) }}" style="flex: 1; text-decoration: none;">
+            <button style="width: 100%; padding: 15px; font-size: 16px; font-weight: bold; border: 2px solid #000;">View Household Members</button>
+        </a>
+        <form action="{{ url_for('employee.employee_query_form', query_type='asset') }}" method="post" style="flex: 1;">
+            <button type="submit" name="query_type" value="asset" style="width: 100%; padding: 15px; font-size: 16px; font-weight: bold; border: 2px solid #000;">Assets</button>
         </form>
-        <form action="{{ url_for('employee.employee_query_form' , query_type='land')}}" method="post" style="flex: 1;">
-            <button type="submit" style="width: 100%; padding: 15px; font-size: 16px; font-weight: bold; border: 2px solid #000;" name="query_category" value="land">Land records</button>
+        <form action="{{ url_for('employee.employee_query_form', query_type='land') }}" method="post" style="flex: 1;">
+            <button type="submit" name="query_category" value="land" style="width: 100%; padding: 15px; font-size: 16px; font-weight: bold; border: 2px solid #000;">Land records</button>
         </form>
     </div>
+    
+    
 </div>
 {% endblock %}

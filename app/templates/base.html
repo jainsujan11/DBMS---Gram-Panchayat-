@@ -3,6 +3,32 @@
 <head>
     <title>Gram Panchayat Management System</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+      body {
+          font-family: Arial, sans-serif;
+          margin: 20px;
+      }
+      h1 {
+          color: #333;
+      }
+      table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+      }
+      th, td {
+          padding: 10px;
+          text-align: left;
+          border-bottom: 1px solid #ddd;
+          border-right: 1px solid #ddd;  /* Vertical line between columns */
+      }
+      th:last-child, td:last-child {
+          border-right: none;  /* Remove right border for the last column */
+      }
+      th {
+          background-color: #f4f4f4;
+      }
+  </style>
 </head>
 <body>
     <div class="container">

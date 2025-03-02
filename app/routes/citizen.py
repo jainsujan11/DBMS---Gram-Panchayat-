@@ -62,6 +62,7 @@ def view_household_members():
     cur = conn.cursor()
     cur.execute(query, params)
     results = cur.fetchall()
+    column_names = [desc[0] for desc in cur.description]
     conn.close()
-    return render_template('employee_query_result.html', query_type="", results=results)
+    return render_template('employee_query_result.html', query_type="household members", results=results,column_names=column_names)
     pass

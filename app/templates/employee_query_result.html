@@ -21,12 +21,17 @@
             padding: 10px;
             text-align: left;
             border-bottom: 1px solid #ddd;
+            border-right: 1px solid #ddd;  /* Vertical line between columns */
+        }
+        th:last-child, td:last-child {
+            border-right: none;  /* Remove right border for the last column */
         }
         th {
             background-color: #f4f4f4;
         }
-    </style>
+    </style>    
 </head>
+
 <body>
     <h1>Query Results - {{ query_type }}</h1>
     <table>

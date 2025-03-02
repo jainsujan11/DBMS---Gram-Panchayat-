@@ -17,7 +17,7 @@ def employee_dashboard():
 # -----------------------------
 @employee_bp.route('/query', methods=['GET', 'POST'])
 def employee_query_select():
-    if 'user_type' not in session or session['user_type'] != 'employee':
+    if 'user_type' not in session or (session['user_type'] != 'employee' and session['user_type']!='citizen'):
         flash("Unauthorized access")
         return redirect(url_for('auth.login'))
     if request.method == 'POST':
@@ -27,7 +27,7 @@ def employee_query_select():
 
 @employee_bp.route('/query/<query_type>', methods=['GET', 'POST'])
 def employee_query_form(query_type):
-    if 'user_type' not in session or session['user_type'] != 'employee':
+    if 'user_type' not in session or (session['user_type'] != 'employee' and session['user_type']!='citizen'):
         flash("Unauthorized access")
         return redirect(url_for('auth.login'))
     results = None

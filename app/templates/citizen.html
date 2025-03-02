@@ -64,33 +64,41 @@
     {% else %}
     <p>No scheme enrollments available.</p>
     {% endif %}
-    <body>
-        <h3>Family Members</h3>
-        <table style="width: 100%;text-align: left">
-            <thead>
-                <tr>
-                    <th>{{"Citizen_id"}}</th>
-                    <th>{{"Name"}}</th>
-                    <th>{{"Gender"}}</th>
-                    <th>{{"Educational Qualification"}}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if household_members %}
-                    {% for row in household_members %}
-                        <tr>
-                            {% for value in row %}
-                                <td>{{ value }}</td>
-                            {% endfor %}
-                        </tr>
-                    {% endfor %}
-                {% else %}
+    <h3>Family Members</h3>
+    <table style="width: 100%; text-align: left">
+        <thead>
+            <tr>
+                <th>Citizen_id</th>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>Educational Qualification</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if household_members %}
+                {% for row in household_members %}
                     <tr>
-                        <td colspan="{{ column_names|length }}">No results found.</td>
+                        {% for value in row %}
+                            <td>{{ value }}</td>
+                        {% endfor %}
                     </tr>
-                {% endif %}
-            </tbody>
-        </table>
-    </body>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="{{ column_names|length }}">No results found.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+    <!-- Buttons Container -->
+    <div style="margin-top: 20px; display: flex; gap: 10px;">
+        <form action="{{ url_for('employee.employee_query_form' , query_type='asset')}}" method="post" style="flex: 1;" name="query_type" value="asset">
+            <button type="submit" style="width: 100%; padding: 15px; font-size: 16px; font-weight: bold; border: 2px solid #000;" name="query_type" value="asset">Assets</button>
+        </form>
+        <form action="{{ url_for('employee.employee_query_form' , query_type='land')}}" method="post" style="flex: 1;">
+            <button type="submit" style="width: 100%; padding: 15px; font-size: 16px; font-weight: bold; border: 2px solid #000;" name="query_category" value="land">Land records</button>
+        </form>
+    </div>
 </div>
 {% endblock %}

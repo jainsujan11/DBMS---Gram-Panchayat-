@@ -35,4 +35,6 @@ def citizen_dashboard():
     cur.close()
     close_db()
 
+    #select * from households where income >= (select avg(income) from households);
+
     return render_template('citizen.html', citizen=citizen, lands=lands, vaccinations=vaccinations, enrollments=enrollments,household_members=household_members)

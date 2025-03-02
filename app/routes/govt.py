@@ -52,9 +52,11 @@ def govt_print_statistics():
     which_query=request.form.get('which_query')
     query=None
     if(which_query=='Birth_Rate'):
-        query="select * from birth_rate_2001"  #select gender,count(*) from citizens where EXTRACT(YEAR FROM dob) = 2001 group by gender
+        # query="select * from birth_rate"  #select gender,count(*) from citizens where EXTRACT(YEAR FROM dob) = 2001 group by gender
+        query="select EXTRACT(YEAR FROM dob) as year,gender,count(*) as count from citizens group by EXTRACT(YEAR FROM dob),gender"
     elif(which_query=='Literacy_Rate'):
-        query="select * from literacy_rate" #select * from citizens where educational_qualification != 'Secondary';
+        # query="select * from literacy_rate" #select * from citizens where educational_qualification != 'Secondary';
+        query="select * from citizens where educational_qualification != 'Secondary';"
     else:
         query="select * from assets"
 
@@ -63,5 +65,9 @@ def govt_print_statistics():
     cur.execute(query)
     results = cur.fetchall()
 
+    print(results)
+
     conn.close()
+    if(which_query=='Birth_Rate'):
+        return render_template('display_graph.html',data=results)
     return render_template('employee_query_result.html',query_type=which_query,results=results)

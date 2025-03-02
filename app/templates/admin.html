@@ -2,6 +2,28 @@
 {% block content %}
 <div class="dashboard">
     <h2>System Administrator Dashboard</h2>
+    <!-- Form for Citizen ID and Employee Type -->
+    <h3>Search by Citizen ID and Employee Type</h3>
+    <form method="get" action="{{ url_for('admin.add_citizen_employee') }}">
+        <div>
+            <label for="citizen_id">Citizen ID:</label>
+            <input type="text" id="citizen_id" name="citizen_id" placeholder="Enter Citizen ID" required>
+        </div>
+        <div>
+            <label for="employee_type">Employee Type:</label>
+            <input type="text" id="employee_type" name="employee_type" placeholder="Enter Employee Type" required>
+        </div>
+        <button type="submit">Search</button>
+    </form>
+    <!-- Form for Removing a Citizen -->
+    <h3>Remove Citizen</h3>
+    <form method="post" action="{{ url_for('admin.remove_citizen') }}">
+        <div>
+            <label for="remove_citizen_id">Citizen ID:</label>
+            <input type="text" id="remove_citizen_id" name="citizen_id" placeholder="Enter Citizen ID to Remove" required>
+        </div>
+        <button type="submit">Remove</button>
+    </form>
     <h3>Execute SQL Query</h3>
     <form method="post" action="{{ url_for('admin.admin_dashboard') }}">
         <textarea name="query" rows="4" cols="50" placeholder="Enter SQL query here"></textarea><br>

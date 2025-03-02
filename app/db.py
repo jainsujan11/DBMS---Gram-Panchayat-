@@ -38,9 +38,11 @@ def init_db():
             username TEXT UNIQUE,
             password TEXT,
             user_type TEXT,
-            citizen_id INTEGER
+            citizen_id INTEGER,
+            FOREIGN KEY(citizen_id) REFERENCES citizens(citizen_id) ON DELETE CASCADE
         )
     ''')
+
     cur.execute('''
         CREATE TABLE IF NOT EXISTS households (
             household_id SERIAL PRIMARY KEY,
@@ -48,6 +50,7 @@ def init_db():
             income REAL
         )
     ''')
+
     cur.execute('''
         CREATE TABLE IF NOT EXISTS citizens (
             citizen_id SERIAL PRIMARY KEY,
@@ -56,26 +59,29 @@ def init_db():
             dob DATE,
             household_id INTEGER,
             educational_qualification TEXT,
-            FOREIGN KEY(household_id) REFERENCES households(household_id)
+            FOREIGN KEY(household_id) REFERENCES households(household_id) ON DELETE CASCADE
         )
     ''')
+
     cur.execute('''
         CREATE TABLE IF NOT EXISTS land_records (
             land_id SERIAL PRIMARY KEY,
             citizen_id INTEGER,
             area_acres REAL,
             crop_type TEXT,
-            FOREIGN KEY(citizen_id) REFERENCES citizens(citizen_id)
+            FOREIGN KEY(citizen_id) REFERENCES citizens(citizen_id) ON DELETE CASCADE
         )
     ''')
+
     cur.execute('''
         CREATE TABLE IF NOT EXISTS panchayat_employees (
             employee_id SERIAL PRIMARY KEY,
             citizen_id INTEGER,
             role TEXT,
-            FOREIGN KEY(citizen_id) REFERENCES citizens(citizen_id)
+            FOREIGN KEY(citizen_id) REFERENCES citizens(citizen_id) ON DELETE CASCADE
         )
     ''')
+
     cur.execute('''
         CREATE TABLE IF NOT EXISTS assets (
             asset_id SERIAL PRIMARY KEY,
@@ -84,6 +90,7 @@ def init_db():
             installation_date DATE
         )
     ''')
+
     cur.execute('''
         CREATE TABLE IF NOT EXISTS welfare_schemes (
             scheme_id SERIAL PRIMARY KEY,
@@ -91,25 +98,28 @@ def init_db():
             description TEXT
         )
     ''')
+
     cur.execute('''
         CREATE TABLE IF NOT EXISTS scheme_enrollments (
             enrollment_id SERIAL PRIMARY KEY,
             citizen_id INTEGER,
             scheme_id INTEGER,
             enrollment_date DATE,
-            FOREIGN KEY(citizen_id) REFERENCES citizens(citizen_id),
-            FOREIGN KEY(scheme_id) REFERENCES welfare_schemes(scheme_id)
+            FOREIGN KEY(citizen_id) REFERENCES citizens(citizen_id) ON DELETE CASCADE,
+            FOREIGN KEY(scheme_id) REFERENCES welfare_schemes(scheme_id) ON DELETE CASCADE
         )
     ''')
+
     cur.execute('''
         CREATE TABLE IF NOT EXISTS vaccinations (
             vaccination_id SERIAL PRIMARY KEY,
             citizen_id INTEGER,
             vaccine_type TEXT,
             date_administered DATE,
-            FOREIGN KEY(citizen_id) REFERENCES citizens(citizen_id)
+            FOREIGN KEY(citizen_id) REFERENCES citizens(citizen_id) ON DELETE CASCADE
         )
     ''')
+
     cur.execute('''
         CREATE TABLE IF NOT EXISTS census_data (
             id SERIAL PRIMARY KEY,
@@ -117,8 +127,8 @@ def init_db():
             citizen_id INTEGER,
             event_type TEXT,
             event_date DATE,
-            FOREIGN KEY(household_id) REFERENCES households(household_id),
-            FOREIGN KEY(citizen_id) REFERENCES citizens(citizen_id)
+            FOREIGN KEY(household_id) REFERENCES households(household_id) ON DELETE CASCADE,
+            FOREIGN KEY(citizen_id) REFERENCES citizens(citizen_id) ON DELETE CASCADE
         )
     ''')
 

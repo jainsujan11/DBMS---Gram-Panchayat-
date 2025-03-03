@@ -1,19 +1,36 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="dashboard">
-    <h2>Add Land Record</h2>
-    <form method="post" action="{{ url_for('employee.employee_add_land') }}">
-        <label>Select Citizen:</label><br>
-        <select name="citizen_id">
+<div class="container my-5">
+  <div class="card shadow">
+    <div class="card-header bg-warning text-dark">
+      <h2 class="mb-0">Add Land Record</h2>
+    </div>
+    <div class="card-body">
+      <form method="post" action="{{ url_for('employee.employee_add_land') }}" id="landForm">
+        <div class="mb-3">
+          <label for="citizen_id" class="form-label">Select Citizen:</label>
+          <select name="citizen_id" id="citizen_id" class="form-select">
             {% for c in citizens %}
-                <option value="{{ c.citizen_id }}">{{ c.name }}</option>
+              <option value="{{ c.citizen_id }}">{{ c.name }}</option>
             {% endfor %}
-        </select><br>
-        <label>Area (acres):</label><br>
-        <input type="number" step="0.1" name="area_acres" required><br>
-        <label>Crop Type:</label><br>
-        <input type="text" name="crop_type" required><br><br>
-        <button type="submit">Add Land Record</button>
-    </form>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="area_acres" class="form-label">Area (acres):</label>
+          <input type="number" step="0.1" name="area_acres" id="area_acres" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label for="crop_type" class="form-label">Crop Type:</label>
+          <input type="text" name="crop_type" id="crop_type" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-warning">Add Land Record</button>
+      </form>
+    </div>
+  </div>
 </div>
+<script>
+  document.getElementById('landForm').addEventListener('submit', function(){
+    console.log("Land form submitted");
+  });
+</script>
 {% endblock %}

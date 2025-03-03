@@ -1,39 +1,56 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="dashboard">
-    <h2>Government Monitor Dashboard</h2>
-    
-    <div class="action-buttons">
-        <!-- Add Welfare Scheme Button -->
-        <form action="{{ url_for('govt.govt_add_scheme') }}" method="get">
-            <button type="submit">Add Welfare Scheme</button>
-        </form>
-
-        <!-- Birth Rate Button -->
-        <form action="{{ url_for('govt.govt_print_statistics') }}" method="post" style="display:block; margin-top:10px;">
-            <button type="submit" name="which_query" value="Birth_Rate">Birth Rate Statistics</button>
-        </form>
-
-        <!-- Literacy Rate Button -->
-        <form action="{{ url_for('govt.govt_print_statistics') }}" method="post" style="display:block; margin-top:10px;">
-            <button type="submit" name="which_query" value="Literacy_Rate">Literacy Rate Statistics</button>
-        </form>
-
-        <!-- Assets Button -->
-        <form action="{{ url_for('govt.govt_print_statistics') }}" method="post" style="display:block; margin-top:10px;">
-            <button type="submit" name="which_query" value="Assets">Assets Statistics</button>
-        </form>
-
-        <!-- Poverty Line Button -->
-        <form action="{{ url_for('govt.govt_print_statistics') }}" method="post" style="display:block; margin-top:10px;">
-            <button type="submit" name="which_query" value="Poverty Line">Poverty Line Statistics</button>
-        </form>
-
-        <!-- Scheme Enrollments Button -->
-        <form action="{{ url_for('govt.govt_print_statistics') }}" method="post" style="display:block; margin-top:10px;">
-            <button type="submit" name="which_query" value="Scheme Enrollments">Scheme Enrollments Statistics</button>
-        </form>
+<div class="container my-5">
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white">
+      <h2 class="mb-0">Government Monitor Dashboard</h2>
     </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <form action="{{ url_for('govt.govt_add_scheme') }}" method="get">
+            <button type="submit" class="btn btn-outline-success w-100">
+              <i class="fas fa-plus-circle"></i> Add Welfare Scheme
+            </button>
+          </form>
+        </div>
+        <div class="col-md-4">
+          <form action="{{ url_for('govt.govt_print_statistics') }}" method="post">
+            <button type="submit" name="which_query" value="Birth_Rate" class="btn btn-outline-info w-100">
+              <i class="fas fa-chart-line"></i> Birth Rate Statistics
+            </button>
+          </form>
+        </div>
+        <div class="col-md-4">
+          <form action="{{ url_for('govt.govt_print_statistics') }}" method="post">
+            <button type="submit" name="which_query" value="Literacy_Rate" class="btn btn-outline-info w-100">
+              <i class="fas fa-book"></i> Literacy Rate Statistics
+            </button>
+          </form>
+        </div>
+        <div class="col-md-4">
+          <form action="{{ url_for('govt.govt_print_statistics') }}" method="post">
+            <button type="submit" name="which_query" value="Assets" class="btn btn-outline-warning w-100">
+              <i class="fas fa-tools"></i> Assets Statistics
+            </button>
+          </form>
+        </div>
+        <div class="col-md-4">
+          <form action="{{ url_for('govt.govt_print_statistics') }}" method="post">
+            <button type="submit" name="which_query" value="Poverty Line" class="btn btn-outline-danger w-100">
+              <i class="fas fa-exclamation-triangle"></i> Poverty Line Statistics
+            </button>
+          </form>
+        </div>
+        <div class="col-md-4">
+          <form action="{{ url_for('govt.govt_print_statistics') }}" method="post">
+            <button type="submit" name="which_query" value="Scheme Enrollments" class="btn btn-outline-primary w-100">
+              <i class="fas fa-user-check"></i> Scheme Enrollments Statistics
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

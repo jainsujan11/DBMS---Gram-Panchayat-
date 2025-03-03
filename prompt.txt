@@ -1,0 +1,859 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+    <h2>Add Citizen to Welfare Scheme</h2>
+    <form action="{{ url_for('employee.submit_citizen_to_scheme') }}" method="POST">
+        <div>
+            <label for="citizen_id">Citizen ID:</label>
+            <select id="citizen_id" name="citizen_id" required>
+                <option value="">Select Citizen ID</option>
+                {% for citizen in citizens %}
+                <option value="{{ citizen.citizen_id }}">{{ citizen.citizen_id }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="scheme_id">Scheme ID:</label>
+            <select id="scheme_id" name="scheme_id" required>
+                <option value="">Select Scheme ID</option>
+                {% for scheme in schemes %}
+                <option value="{{ scheme.scheme_id }}">{{ scheme.scheme_id }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="date_of_enrollment">Date of Enrollment:</label>
+            <input type="date" id="date_of_enrollment" name="date_of_enrollment" required>
+        </div>
+        <button type="submit">Submit</button>
+    </form>
+</div>
+{% endblock %}
+add_citizen_to_scheme.html
+
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+    <h2>System Administrator Dashboard</h2>
+    <!-- Form for Citizen ID and Employee Type -->
+    <h3>Promote Citizen ID to Employee Type</h3>
+    <form method="get" action="{{ url_for('admin.add_citizen_employee') }}">
+        <div>
+            <label for="citizen_id">Citizen ID:</label>
+            <input type="text" id="citizen_id" name="citizen_id" placeholder="Enter Citizen ID" required>
+        </div>
+        <div>
+            <label for="employee_type">Employee Type:</label>
+            <input type="text" id="employee_type" name="employee_type" placeholder="Enter Employee Type" required>
+        </div>
+        <button type="submit">Promote</button>
+    </form>
+    <!-- Form for Removing a Citizen -->
+    <h3>Demote Citizen</h3>
+    <form method="post" action="{{ url_for('admin.remove_citizen') }}">
+        <div>
+            <label for="remove_citizen_id">Citizen ID:</label>
+            <input type="text" id="remove_citizen_id" name="citizen_id" placeholder="Enter Citizen ID to Remove" required>
+        </div>
+        <button type="submit">Remove</button>
+    </form>
+    <h3>Execute SQL Query</h3>
+    <form method="post" action="{{ url_for('admin.admin_dashboard') }}">
+        <textarea name="query" rows="4" cols="50" placeholder="Enter SQL query here"></textarea><br>
+        <button type="submit">Execute</button>
+    </form>
+    {% if query_executed %}
+        <h4>Executed Query:</h4>
+        <p>{{ query_executed }}</p>
+    {% endif %}
+    {% if result %}
+        <h4>Results:</h4>
+        <table>
+            <tr>
+            {% for column in result[0].keys() %}
+                <th>{{ column }}</th>
+            {% endfor %}
+            </tr>
+            {% for row in result %}
+            <tr>
+                {% for column in row.keys() %}
+                <td>{{ row[column] }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+</div>
+{% endblock %}
+admin.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gram Panchayat Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+      body {
+          font-family: Arial, sans-serif;
+          margin: 20px;
+      }
+      h1 {
+          color: #333;
+      }
+      table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+      }
+      th, td {
+          padding: 10px;
+          text-align: left;
+          border-bottom: 1px solid #ddd;
+          border-right: 1px solid #ddd;  /* Vertical line between columns */
+      }
+      th:last-child, td:last-child {
+          border-right: none;  /* Remove right border for the last column */
+      }
+      th {
+          background-color: #f4f4f4;
+      }
+  </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Gram Panchayat Management System</h1>
+            {% if session.get('user_type') %}
+            <nav>
+                <a href="{{ url_for('dashboard') }}">Dashboard</a> |
+                <a href="{{ url_for('auth.logout') }}">Logout</a>
+            </nav>
+            {% endif %}
+        </header>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class="flashes">
+              {% for message in messages %}
+                <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
+base.html
+
+
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+    <h2>Citizen Dashboard</h2>
+    <h3>Your Information</h3>
+    <p>Name: {{ citizen.name }}</p>
+    <p>Gender: {{ citizen.gender }}</p>
+    <p>Date of Birth: {{ citizen.dob }}</p>
+    <p>Educational Qualification: {{ citizen.educational_qualification }}</p>
+    <p>Home ID: {{ citizen.household_id }}</p>
+    <h3>Land Records</h3>
+    {% if lands %}
+    <table>
+        <tr>
+            <th>Land ID</th>
+            <th>Area (acres)</th>
+            <th>Crop Type</th>
+        </tr>
+        {% for land in lands %}
+        <tr>
+            <td>{{ land.land_id }}</td>
+            <td>{{ land.area_acres }}</td>
+            <td>{{ land.crop_type }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>No land records available.</p>
+    {% endif %}
+    <h3>Vaccinations</h3>
+    {% if vaccinations %}
+    <table>
+        <tr>
+            <th>Vaccination ID</th>
+            <th>Vaccine Type</th>
+            <th>Date Administered</th>
+        </tr>
+        {% for vac in vaccinations %}
+        <tr>
+            <td>{{ vac.vaccination_id }}</td>
+            <td>{{ vac.vaccine_type }}</td>
+            <td>{{ vac.date_administered }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>No vaccination records available.</p>
+    {% endif %}
+    <h3>Scheme Enrollments</h3>
+    {% if enrollments %}
+    <table>
+        <tr>
+            <th>Enrollment ID</th>
+            <th>Scheme ID</th>
+            <th>Enrollment Date</th>
+        </tr>
+        {% for enroll in enrollments %}
+        <tr>
+            <td>{{ enroll.enrollment_id }}</td>
+            <td>{{ enroll.scheme_id }}</td>
+            <td>{{ enroll.enrollment_date }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>No scheme enrollments available.</p>
+    {% endif %}
+    <div style="margin-top: 20px; display: flex; gap: 10px;">
+        <a href="{{ url_for('citizen.view_household_members', household_id=citizen.household_id, citizen_id=citizen.citizen_id) }}" style="flex: 1; text-decoration: none;">
+            <button style="width: 100%; padding: 15px; font-size: 16px; font-weight: bold; border: 2px solid #000;">View Household Members</button>
+        </a>
+        <form action="{{ url_for('employee.employee_query_form', query_type='asset') }}" method="post" style="flex: 1;">
+            <button type="submit" name="query_type" value="asset" style="width: 100%; padding: 15px; font-size: 16px; font-weight: bold; border: 2px solid #000;">Assets</button>
+        </form>
+        <form action="{{ url_for('employee.employee_query_form', query_type='land') }}" method="post" style="flex: 1;">
+            <button type="submit" name="query_category" value="land" style="width: 100%; padding: 15px; font-size: 16px; font-weight: bold; border: 2px solid #000;">Land records</button>
+        </form>
+    </div>
+    
+    
+</div>
+{% endblock %}
+citizen.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Grouped Data Graph</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h2>Year Wise Birth Rate</h2>
+    <canvas id="myChart" width="800" height="400"></canvas>
+    <script>
+        // Parse data from Flask, which should be a JSON array of arrays.
+        const dataFromServer = JSON.parse('{{ data | tojson | safe }}');
+    
+        // Prepare an object to group counts by year and gender.
+        const groupedData = {};
+    
+        dataFromServer.forEach(item => {
+            // Access tuple elements by index:
+            const year = item[0];      // First element (year)
+            const gender = item[1];    // Second element (gender)
+            const count = item[2];     // Third element (count)
+    
+            // Initialize group if needed
+            if (!groupedData[year]) {
+                groupedData[year] = { Male: 0, Female: 0 };
+            }
+            // Assign count to the proper gender for that year.
+            groupedData[year][gender] = count;
+        });
+    
+        // Create arrays for labels and datasets
+        const labels = Object.keys(groupedData).sort();  // Sorted list of years
+        const maleData = labels.map(year => groupedData[year]['Male'] || 0);
+        const femaleData = labels.map(year => groupedData[year]['Female'] || 0);
+    
+        // Create a bar chart using Chart.js
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Male',
+                        data: maleData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Female',
+                        data: femaleData,
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Birth Year and Gender Distribution'
+                    }
+                }
+            }
+        });
+    </script>    
+</body>
+</html>
+display_graph.html
+
+
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+    <h2>Add Asset Record</h2>
+    <form method="post" action="{{ url_for('employee.employee_add_asset') }}">
+        <label>Asset Type:</label><br>
+        <select name="asset_type">
+            <option value="Street Light">Street Light</option>
+            <option value="Water Pump">Water Pump</option>
+            <option value="Road">Road</option>
+        </select><br>
+        <label>Location:</label><br>
+        <input type="text" name="location" required><br>
+        <label>Installation Date:</label><br>
+        <input type="date" name="installation_date" required><br><br>
+        <button type="submit">Add Asset</button>
+    </form>
+</div>
+{% endblock %}
+employee_add_asset.html
+
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+    <h2>Add Citizen Record</h2>
+    <form method="post" action="{{ url_for('employee.employee_add_citizen') }}">
+        <label>Username:</label><br>
+        <input type="text" name="username" required><br>
+        <label>Password:</label><br>
+        <input type="password" name="password" required><br>
+        <label>Name:</label><br>
+        <input type="text" name="name" required><br>
+        <label>Gender:</label><br>
+        <select name="gender">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select><br>
+        <label>Date of Birth:</label><br>
+        <input type="date" name="dob" required><br>
+        <label>Educational Qualification:</label><br>
+        <input type="text" name="educational_qualification" required><br>
+        <label>Select Household:</label><br>
+        <select name="household_id">
+            {% for h in households %}
+                <option value="{{ h.household_id }}">{{ h.address }} (Income: {{ h.income }})</option>
+            {% endfor %}
+        </select><br><br>
+        <button type="submit">Add Citizen</button>
+    </form>
+</div>
+{% endblock %}
+employee_add_citizen.html
+
+
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+    <h2>Add Land Record</h2>
+    <form method="post" action="{{ url_for('employee.employee_add_land') }}">
+        <label>Select Citizen:</label><br>
+        <select name="citizen_id">
+            {% for c in citizens %}
+                <option value="{{ c.citizen_id }}">{{ c.name }}</option>
+            {% endfor %}
+        </select><br>
+        <label>Area (acres):</label><br>
+        <input type="number" step="0.1" name="area_acres" required><br>
+        <label>Crop Type:</label><br>
+        <input type="text" name="crop_type" required><br><br>
+        <button type="submit">Add Land Record</button>
+    </form>
+</div>
+{% endblock %}
+employee_add_land.html
+
+
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+    <h2>Employee Add/Modify</h2>
+    <ul>
+        <li><a href="{{ url_for('employee.employee_add_citizen') }}">Add Citizen</a></li>
+        <li><a href="{{ url_for('employee.employee_add_land') }}">Add Land Record</a></li>
+        <li><a href="{{ url_for('employee.employee_add_asset') }}">Add Asset</a></li>
+        <li>
+            <!-- Form for Modify Citizen -->
+            <form action="{{ url_for('employee.employee_modify_citizen') }}" method="GET" style="display: inline;">
+                <label for="citizen_id">Citizen ID:</label>
+                <input type="text" id="citizen_id" name="citizen_id" required>
+                <button type="submit">Modify Citizen</button>
+            </form>
+        </li>
+        <!-- You can add more options for schemes, vaccinations, etc. -->
+    </ul>
+</div>
+{% endblock %}
+employee_add_select.html
+
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+    <h2>Panchayat Employee Dashboard</h2>
+    <p>Please choose an option:</p>
+    <ul>
+        <li><a href="{{ url_for('employee.employee_query_select') }}">Query Data</a></li>
+        <li><a href="{{ url_for('employee.employee_add_select') }}">Add / Modify Data</a></li>
+        <li><a href="{{ url_for('employee.employee_add_citizen_to_scheme') }}">Add citizen to scheme</a></li>
+    </ul>
+</div>
+{% endblock %}
+employee_dashboard.html
+
+
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+    <h2>Employee Query - {{ query_type|capitalize }} Filters</h2>
+    <form method="post" action="{{ url_for('employee.employee_query_form', query_type=query_type) }}">
+        {% if query_type == 'citizen' %}
+            <label>Name:</label><br>
+            <input type="text" name="name"><br>
+            <label>Gender:</label><br>
+            <select name="gender">
+                <option value="Any">Any</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select><br>
+            <label>Educational Qualification:</label><br>
+            <input type="text" name="educational_qualification"><br>
+            <label>Minimum Land (acres):</label><br>
+            <input type="number" step="0.1" name="min_land"><br>
+            <label>Max Household Income:</label><br>
+            <input type="number" step="0.01" name="max_income"><br>
+            <label>Date of Birth:</label><br>
+            <input type="date" name="dob"><br>
+            <label>Only Pradhan?</label>
+            <input type="checkbox" name="is_pradhan"><br>
+            <label>Only any Employee? (i.e., has a role)</label>
+            <input type="checkbox" name="is_employee"><br>
+            <label>Display all Household members?</label>
+            <input type="checkbox" name="is_household"><br>
+            <label>Vaccination Year:</label><br>
+            <input type="number" name="vaccination_year"><br>
+        {% elif query_type == 'asset' %}
+            <label>Locality:</label><br>
+            <input type="text" name="locality"><br>
+            <label>Year of Installation:</label><br>
+            <input type="number" name="year"><br>
+            <label>Asset Type:</label><br>
+            <select name="asset_type">
+                <option value="">Any</option>
+                <option value="Street Light">Street Light</option>
+                <option value="Water Pump">Water Pump</option>
+                <option value="Road">Road</option>
+            </select><br>
+        {% elif query_type == 'land' %}
+            <label>Crop Type:</label><br>
+            <input type="text" name="crop"><br>
+        {% endif %}
+        <br>
+        <button type="submit">Run Query</button>
+    </form>
+    {% if results is not none %}
+        <h3>Results:</h3>
+        {% if results %}
+        <table>
+            <tr>
+                {% for col in results[0].keys() %}
+                    <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in results %}
+            <tr>
+                {% for col in row.keys() %}
+                    <td>{{ row[col] }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+            <p>No results found.</p>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
+employee_query_form.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Query Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            border-right: 1px solid #ddd;  /* Vertical line between columns */
+        }
+        th:last-child, td:last-child {
+            border-right: none;  /* Remove right border for the last column */
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>    
+</head>
+
+<body>
+    <h1>Query Results - {{ query_type }}</h1>
+    <table>
+        <thead>
+            <tr>
+                {% if results %}
+                    {% for column in column_names %}
+                        <th>{{ column }}</th>
+                    {% endfor %}
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% if results %}
+                {% for row in results %}
+                    <tr>
+                        {% for value in row %}
+                            <td>{{ value }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="{{ column_names|length }}">No results found.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</body>
+</html>
+employee_query_result.html
+
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+    <h2>Employee Query - Select Category</h2>
+    <form method="post" action="{{ url_for('employee.employee_query_select') }}">
+        <label>Select Query Category:</label>
+        <select name="query_category">
+            <option value="citizen">Citizen Queries</option>
+            <option value="asset">Asset Queries</option>
+            <option value="land">Land Queries</option>
+        </select>
+        <button type="submit">Proceed</button>
+    </form>
+</div>
+{% endblock %}
+employee_query_select.html
+
+<!-- templates/add_scheme.html -->
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+    <h2>Add New Scheme</h2>
+    <form action="{{ url_for('govt.govt_add_scheme') }}" method="post">
+        <div>
+            <label for="scheme_number">Scheme Number:</label>
+            <input type="number" id="scheme_number" name="scheme_number" required>
+        </div>
+        <div>
+            <label for="scheme_name">Scheme Name:</label>
+            <input type="text" id="scheme_name" name="scheme_name" required>
+        </div>
+        <div>
+            <label for="scheme_description">Scheme Description:</label>
+            <input type="text" id="scheme_description" name="scheme_description" required>
+        </div>
+        <button type="submit">Submit</button>
+    </form>
+</div>
+{% endblock %}
+govt_add_scheme.html
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard">
+    <h2>Government Monitor Dashboard</h2>
+    
+    <div class="action-buttons">
+        <!-- Add Welfare Scheme Button -->
+        <form action="{{ url_for('govt.govt_add_scheme') }}" method="get">
+            <button type="submit">Add Welfare Scheme</button>
+        </form>
+
+        <!-- Birth Rate Button -->
+        <form action="{{ url_for('govt.govt_print_statistics') }}" method="post" style="display:block; margin-top:10px;">
+            <button type="submit" name="which_query" value="Birth_Rate">Birth Rate Statistics</button>
+        </form>
+
+        <!-- Literacy Rate Button -->
+        <form action="{{ url_for('govt.govt_print_statistics') }}" method="post" style="display:block; margin-top:10px;">
+            <button type="submit" name="which_query" value="Literacy_Rate">Literacy Rate Statistics</button>
+        </form>
+
+        <!-- Assets Button -->
+        <form action="{{ url_for('govt.govt_print_statistics') }}" method="post" style="display:block; margin-top:10px;">
+            <button type="submit" name="which_query" value="Assets">Assets Statistics</button>
+        </form>
+
+        <!-- Poverty Line Button -->
+        <form action="{{ url_for('govt.govt_print_statistics') }}" method="post" style="display:block; margin-top:10px;">
+            <button type="submit" name="which_query" value="Poverty Line">Poverty Line Statistics</button>
+        </form>
+
+        <!-- Scheme Enrollments Button -->
+        <form action="{{ url_for('govt.govt_print_statistics') }}" method="post" style="display:block; margin-top:10px;">
+            <button type="submit" name="which_query" value="Scheme Enrollments">Scheme Enrollments Statistics</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+govt.html
+
+{% extends "base.html" %}
+{% block content %}
+<div class="form-container">
+    <h2>Login</h2>
+    <form method="post" action="{{ url_for('auth.login') }}">
+        <label>Username:</label><br>
+        <input type="text" name="username" required><br>
+        <label>Password:</label><br>
+        <input type="password" name="password" required><br><br>
+        <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="{{ url_for('auth.signup') }}">Sign Up</a></p>
+</div>
+{% endblock %}
+login.html
+
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+    <h2>Modify Citizen</h2>
+    <form action="{{ url_for('employee.update_citizen', citizen_id=citizen.citizen_id) }}" method="POST">
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" value="{{ citizen.name }}" required>
+        </div>
+        <div>
+            <label for="gender">Gender:</label>
+            <input type="text" id="gender" name="gender" value="{{ citizen.gender }}" required>
+        </div>
+        <div>
+            <label for="dob">Date of Birth:</label>
+            <input type="text" id="dob" name="dob" value="{{ citizen.dob }}" required>
+        </div>
+        <div>
+            <label for="household_id">Household ID:</label>
+            <input type="number" id="household_id" name="household_id" value="{{ citizen.household_id }}" required>
+        </div>
+        <div>
+            <label for="educational_qualification">Educational Qualification:</label>
+            <input type="text" id="educational_qualification" name="educational_qualification" value="{{ citizen.educational_qualification }}" required>
+        </div>
+        <button type="submit">Update</button>
+    </form>
+</div>
+{% endblock %}
+modify_citizen.html
+
+{% extends "base.html" %}
+{% block content %}
+<div class="form-container">
+    <h2>Sign Up</h2>
+    <form method="post" action="{{ url_for('auth.signup') }}">
+        <label>Username:</label><br>
+        <input type="text" name="username" required><br>
+        <label>Password:</label><br>
+        <input type="password" name="password" required><br>
+        <label>User Type:</label><br>
+        <select name="user_type" id="user_type" onchange="toggleCitizenFields()">
+            <option value="citizen">Citizen</option>
+            <option value="govt">Government Monitor</option>
+            <option value="admin">System Administrator</option>
+        </select><br><br>
+        <div id="citizen_fields">
+            <h3>Citizen Details</h3>
+            <label>Name:</label><br>
+            <input type="text" name="name"><br>
+            <label>Gender:</label><br>
+            <select name="gender">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select><br>
+            <label>Date of Birth:</label><br>
+            <input type="date" name="dob"><br>
+            <label>Educational Qualification:</label><br>
+            <input type="text" name="educational_qualification"><br>
+            <label>Household:</label><br>
+            <input type="radio" name="household_choice" value="existing" checked> Join Existing
+            <input type="radio" name="household_choice" value="new"> Create New<br>
+            <div id="existing_household_div">
+                <label>Select Household:</label><br>
+                <select name="existing_household">
+                    {% for h in households %}
+                        <option value="{{ h.household_id }}">{{ h.household_id }} - {{ h.address }}</option>
+                    {% endfor %}
+                </select><br>
+            </div>
+            
+            <div id="new_household_div" style="display:none;">
+                <label>Address:</label><br>
+                <input type="text" name="address"><br>
+                <label>Income:</label><br>
+                <input type="number" name="income" step="0.01"><br>
+            </div>
+        </div>
+        <br>
+        <button type="submit">Sign Up</button>
+    </form>
+</div>
+<script>
+function toggleCitizenFields() {
+    var userType = document.getElementById("user_type").value;
+    var citizenFields = document.getElementById("citizen_fields");
+    if(userType === 'citizen') {
+        citizenFields.style.display = "block";
+    } else {
+        citizenFields.style.display = "none";
+    }
+}
+document.getElementsByName("household_choice").forEach(function(elem){
+    elem.addEventListener("change", function(){
+        if(this.value === "new"){
+            document.getElementById("new_household_div").style.display = "block";
+            document.getElementById("existing_household_div").style.display = "none";
+        } else {
+            document.getElementById("new_household_div").style.display = "none";
+            document.getElementById("existing_household_div").style.display = "block";
+        }
+    });
+});
+</script>
+{% endblock %}
+a
+signup.html
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+    margin: 0;
+    padding: 0;
+}
+.container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+}
+header {
+    background: #35424a;
+    color: #ffffff;
+    padding-top: 30px;
+    min-height: 70px;
+    border-bottom: #e8491d 3px solid;
+}
+header h1 {
+    text-align: center;
+    margin: 0;
+    padding-bottom: 10px;
+}
+nav {
+    text-align: center;
+    margin-bottom: 10px;
+}
+nav a {
+    color: #ffffff;
+    margin: 0 15px;
+    text-decoration: none;
+}
+.form-container, .dashboard {
+    background: #ffffff;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 5px;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+}
+table, th, td {
+    border: 1px solid #ddd;
+}
+th, td {
+    padding: 8px;
+    text-align: left;
+}
+.flashes {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+.flashes li {
+    background: #ffcccc;
+    padding: 10px;
+    border: 1px solid #ff0000;
+    margin-bottom: 5px;
+}
+button {
+    padding: 10px 15px;
+    background: #35424a;
+    color: #ffffff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+button:hover {
+    background: #e8491d;
+}
+static.css
+
+
+
+
+modify these html files such they look extremely professional, frontend heavy, add visualizations wherever possible, add javascript code wherever needed, donot make any extra files keep the file names same,donot skip any file, give me each and everything i only know how to ^C + ^V. 
+
+
+
+

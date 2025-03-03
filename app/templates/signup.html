@@ -1,65 +1,87 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="form-container">
-    <h2>Sign Up</h2>
-    <form method="post" action="{{ url_for('auth.signup') }}">
-        <label>Username:</label><br>
-        <input type="text" name="username" required><br>
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br>
-        <label>User Type:</label><br>
-        <select name="user_type" id="user_type" onchange="toggleCitizenFields()">
+<div class="container my-5">
+  <div class="card shadow mx-auto" style="max-width: 600px;">
+    <div class="card-header bg-secondary text-white text-center">
+      <h2>Sign Up</h2>
+    </div>
+    <div class="card-body">
+      <form method="post" action="{{ url_for('auth.signup') }}" id="signupForm">
+        <div class="mb-3">
+          <label class="form-label">Username:</label>
+          <input type="text" name="username" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Password:</label>
+          <input type="password" name="password" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">User Type:</label>
+          <select name="user_type" id="user_type" class="form-select" onchange="toggleCitizenFields()">
             <option value="citizen">Citizen</option>
             <option value="govt">Government Monitor</option>
             <option value="admin">System Administrator</option>
-        </select><br><br>
-        <div id="citizen_fields">
-            <h3>Citizen Details</h3>
-            <label>Name:</label><br>
-            <input type="text" name="name"><br>
-            <label>Gender:</label><br>
-            <select name="gender">
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-            </select><br>
-            <label>Date of Birth:</label><br>
-            <input type="date" name="dob"><br>
-            <label>Educational Qualification:</label><br>
-            <input type="text" name="educational_qualification"><br>
-            <label>Household:</label><br>
-            <input type="radio" name="household_choice" value="existing" checked> Join Existing
-            <input type="radio" name="household_choice" value="new"> Create New<br>
-            <div id="existing_household_div">
-                <label>Select Household:</label><br>
-                <select name="existing_household">
-                    {% for h in households %}
-                        <option value="{{ h.household_id }}">{{ h.household_id }} - {{ h.address }}</option>
-                    {% endfor %}
-                </select><br>
-            </div>
-            
-            <div id="new_household_div" style="display:none;">
-                <label>Address:</label><br>
-                <input type="text" name="address"><br>
-                <label>Income:</label><br>
-                <input type="number" name="income" step="0.01"><br>
-            </div>
+          </select>
         </div>
-        <br>
-        <button type="submit">Sign Up</button>
-    </form>
+        <div id="citizen_fields">
+          <h4>Citizen Details</h4>
+          <div class="mb-3">
+            <label class="form-label">Name:</label>
+            <input type="text" name="name" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Gender:</label>
+            <select name="gender" class="form-select">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Date of Birth:</label>
+            <input type="date" name="dob" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Educational Qualification:</label>
+            <input type="text" name="educational_qualification" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Household:</label><br>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="household_choice" value="existing" id="existingRadio" checked>
+              <label class="form-check-label" for="existingRadio">Join Existing</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="household_choice" value="new" id="newRadio">
+              <label class="form-check-label" for="newRadio">Create New</label>
+            </div>
+          </div>
+          <div id="existing_household_div" class="mb-3">
+            <label class="form-label">Select Household:</label>
+            <select name="existing_household" class="form-select">
+              {% for h in households %}
+                <option value="{{ h.household_id }}">{{ h.household_id }} - {{ h.address }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div id="new_household_div" class="mb-3" style="display:none;">
+            <label class="form-label">Address:</label>
+            <input type="text" name="address" class="form-control">
+            <label class="form-label mt-2">Income:</label>
+            <input type="number" name="income" step="0.01" class="form-control">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-secondary w-100">Sign Up</button>
+      </form>
+    </div>
+  </div>
 </div>
 <script>
 function toggleCitizenFields() {
     var userType = document.getElementById("user_type").value;
     var citizenFields = document.getElementById("citizen_fields");
-    if(userType === 'citizen') {
-        citizenFields.style.display = "block";
-    } else {
-        citizenFields.style.display = "none";
-    }
+    citizenFields.style.display = (userType === 'citizen') ? "block" : "none";
 }
-document.getElementsByName("household_choice").forEach(function(elem){
+document.querySelectorAll('input[name="household_choice"]').forEach(function(elem){
     elem.addEventListener("change", function(){
         if(this.value === "new"){
             document.getElementById("new_household_div").style.display = "block";
@@ -72,4 +94,3 @@ document.getElementsByName("household_choice").forEach(function(elem){
 });
 </script>
 {% endblock %}
-a

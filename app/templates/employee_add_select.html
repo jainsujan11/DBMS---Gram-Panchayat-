@@ -1,20 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="dashboard">
-    <h2>Employee Add/Modify</h2>
-    <ul>
-        <li><a href="{{ url_for('employee.employee_add_citizen') }}">Add Citizen</a></li>
-        <li><a href="{{ url_for('employee.employee_add_land') }}">Add Land Record</a></li>
-        <li><a href="{{ url_for('employee.employee_add_asset') }}">Add Asset</a></li>
-        <li>
-            <!-- Form for Modify Citizen -->
-            <form action="{{ url_for('employee.employee_modify_citizen') }}" method="GET" style="display: inline;">
-                <label for="citizen_id">Citizen ID:</label>
-                <input type="text" id="citizen_id" name="citizen_id" required>
-                <button type="submit">Modify Citizen</button>
-            </form>
-        </li>
-        <!-- You can add more options for schemes, vaccinations, etc. -->
-    </ul>
+<div class="container my-5">
+  <div class="card shadow">
+    <div class="card-header bg-dark text-white">
+      <h2 class="mb-0">Employee Add/Modify</h2>
+    </div>
+    <div class="card-body">
+      <div class="list-group">
+        <a href="{{ url_for('employee.employee_add_citizen') }}" class="list-group-item list-group-item-action">
+          <i class="fas fa-user-plus"></i> Add Citizen
+        </a>
+        <a href="{{ url_for('employee.employee_add_land') }}" class="list-group-item list-group-item-action">
+          <i class="fas fa-landmark"></i> Add Land Record
+        </a>
+        <a href="{{ url_for('employee.employee_add_asset') }}" class="list-group-item list-group-item-action">
+          <i class="fas fa-toolbox"></i> Add Asset
+        </a>
+        <div class="list-group-item">
+          <form action="{{ url_for('employee.employee_modify_citizen') }}" method="GET" class="d-flex">
+            <input type="text" id="citizen_id" name="citizen_id" class="form-control me-2" placeholder="Citizen ID" required>
+            <button type="submit" class="btn btn-outline-primary">Modify Citizen</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

@@ -1,64 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Query Results</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        h1 {
-            color: #333;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-            border-right: 1px solid #ddd;  /* Vertical line between columns */
-        }
-        th:last-child, td:last-child {
-            border-right: none;  /* Remove right border for the last column */
-        }
-        th {
-            background-color: #f4f4f4;
-        }
-    </style>    
-</head>
-
-<body>
-    <h1>Query Results - {{ query_type }}</h1>
-    <table>
-        <thead>
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+  <h1>Query Results - {{ query_type }}</h1>
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover">
+      <thead class="table-dark">
+        <tr>
+          {% if results %}
+            {% for column in column_names %}
+              <th>{{ column }}</th>
+            {% endfor %}
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% if results %}
+          {% for row in results %}
             <tr>
-                {% if results %}
-                    {% for column in column_names %}
-                        <th>{{ column }}</th>
-                    {% endfor %}
-                {% endif %}
+              {% for value in row %}
+                <td>{{ value }}</td>
+              {% endfor %}
             </tr>
-        </thead>
-        <tbody>
-            {% if results %}
-                {% for row in results %}
-                    <tr>
-                        {% for value in row %}
-                            <td>{{ value }}</td>
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-            {% else %}
-                <tr>
-                    <td colspan="{{ column_names|length }}">No results found.</td>
-                </tr>
-            {% endif %}
-        </tbody>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="{{ column_names|length }}">No results found.</td>
+          </tr>
+        {% endif %}
+      </tbody>
     </table>
-</body>
-</html>
+  </div>
+</div>
+{% endblock %}

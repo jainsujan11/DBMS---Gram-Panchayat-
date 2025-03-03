@@ -1,72 +1,113 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="dashboard">
-    <h2>Employee Query - {{ query_type|capitalize }} Filters</h2>
-    <form method="post" action="{{ url_for('employee.employee_query_form', query_type=query_type) }}">
+<div class="container my-5">
+  <div class="card shadow">
+    <div class="card-header bg-secondary text-white">
+      <h2 class="mb-0">Employee Query - {{ query_type|capitalize }} Filters</h2>
+    </div>
+    <div class="card-body">
+      <form method="post" action="{{ url_for('employee.employee_query_form', query_type=query_type) }}">
         {% if query_type == 'citizen' %}
-            <label>Name:</label><br>
-            <input type="text" name="name"><br>
-            <label>Gender:</label><br>
-            <select name="gender">
-                <option value="Any">Any</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-            </select><br>
-            <label>Educational Qualification:</label><br>
-            <input type="text" name="educational_qualification"><br>
-            <label>Minimum Land (acres):</label><br>
-            <input type="number" step="0.1" name="min_land"><br>
-            <label>Max Household Income:</label><br>
-            <input type="number" step="0.01" name="max_income"><br>
-            <label>Date of Birth:</label><br>
-            <input type="date" name="dob"><br>
-            <label>Only Pradhan?</label>
-            <input type="checkbox" name="is_pradhan"><br>
-            <label>Only any Employee? (i.e., has a role)</label>
-            <input type="checkbox" name="is_employee"><br>
-            <label>Display all Household members?</label>
-            <input type="checkbox" name="is_household"><br>
-            <label>Vaccination Year:</label><br>
-            <input type="number" name="vaccination_year"><br>
+          <div class="mb-3">
+            <label class="form-label">Name:</label>
+            <input type="text" name="name" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Gender:</label>
+            <select name="gender" class="form-select">
+              <option value="Any">Any</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Educational Qualification:</label>
+            <input type="text" name="educational_qualification" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Minimum Land (acres):</label>
+            <input type="number" step="0.1" name="min_land" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Max Household Income:</label>
+            <input type="number" step="0.01" name="max_income" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Date of Birth:</label>
+            <input type="date" name="dob" class="form-control">
+          </div>
+          <div class="form-check mb-3">
+            <input type="checkbox" name="is_pradhan" class="form-check-input" id="is_pradhan">
+            <label class="form-check-label" for="is_pradhan">Only Pradhan?</label>
+          </div>
+          <div class="form-check mb-3">
+            <input type="checkbox" name="is_employee" class="form-check-input" id="is_employee">
+            <label class="form-check-label" for="is_employee">Only any Employee? (i.e., has a role)</label>
+          </div>
+          <div class="form-check mb-3">
+            <input type="checkbox" name="is_household" class="form-check-input" id="is_household">
+            <label class="form-check-label" for="is_household">Display all Household members?</label>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Vaccination Year:</label>
+            <input type="number" name="vaccination_year" class="form-control">
+          </div>
         {% elif query_type == 'asset' %}
-            <label>Locality:</label><br>
-            <input type="text" name="locality"><br>
-            <label>Year of Installation:</label><br>
-            <input type="number" name="year"><br>
-            <label>Asset Type:</label><br>
-            <select name="asset_type">
-                <option value="">Any</option>
-                <option value="Street Light">Street Light</option>
-                <option value="Water Pump">Water Pump</option>
-                <option value="Road">Road</option>
-            </select><br>
+          <div class="mb-3">
+            <label class="form-label">Locality:</label>
+            <input type="text" name="locality" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Year of Installation:</label>
+            <input type="number" name="year" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Asset Type:</label>
+            <select name="asset_type" class="form-select">
+              <option value="">Any</option>
+              <option value="Street Light">Street Light</option>
+              <option value="Water Pump">Water Pump</option>
+              <option value="Road">Road</option>
+            </select>
+          </div>
         {% elif query_type == 'land' %}
-            <label>Crop Type:</label><br>
-            <input type="text" name="crop"><br>
+          <div class="mb-3">
+            <label class="form-label">Crop Type:</label>
+            <input type="text" name="crop" class="form-control">
+          </div>
         {% endif %}
-        <br>
-        <button type="submit">Run Query</button>
-    </form>
-    {% if results is not none %}
-        <h3>Results:</h3>
+        <button type="submit" class="btn btn-primary">Run Query</button>
+      </form>
+      
+      {% if results is not none %}
+        <hr>
+        <h3 class="mt-4">Results:</h3>
         {% if results %}
-        <table>
+        <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+          <thead class="table-dark">
             <tr>
-                {% for col in results[0].keys() %}
-                    <th>{{ col }}</th>
-                {% endfor %}
+              {% for col in results[0].keys() %}
+                <th>{{ col }}</th>
+              {% endfor %}
             </tr>
+          </thead>
+          <tbody>
             {% for row in results %}
             <tr>
-                {% for col in row.keys() %}
-                    <td>{{ row[col] }}</td>
-                {% endfor %}
+              {% for col in row.keys() %}
+                <td>{{ row[col] }}</td>
+              {% endfor %}
             </tr>
             {% endfor %}
+          </tbody>
         </table>
+        </div>
         {% else %}
             <p>No results found.</p>
         {% endif %}
-    {% endif %}
+      {% endif %}
+    </div>
+  </div>
 </div>
 {% endblock %}

@@ -1,54 +1,106 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="dashboard">
-    <h2>System Administrator Dashboard</h2>
-    <!-- Form for Citizen ID and Employee Type -->
-    <h3>Promote Citizen ID to Employee Type</h3>
-    <form method="get" action="{{ url_for('admin.add_citizen_employee') }}">
-        <div>
-            <label for="citizen_id">Citizen ID:</label>
-            <input type="text" id="citizen_id" name="citizen_id" placeholder="Enter Citizen ID" required>
+<div class="container my-5">
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white">
+            <h2 class="mb-0">System Administrator Dashboard</h2>
         </div>
-        <div>
-            <label for="employee_type">Employee Type:</label>
-            <input type="text" id="employee_type" name="employee_type" placeholder="Enter Employee Type" required>
+        <div class="card-body">
+            <!-- Promote Citizen -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-user-plus"></i> Promote Citizen ID to Employee</h3>
+                </div>
+                <div class="card-body">
+                    <form method="get" action="{{ url_for('admin.add_citizen_employee') }}">
+                        <div class="mb-3">
+                            <label for="citizen_id" class="form-label">Citizen ID:</label>
+                            <input type="text" id="citizen_id" name="citizen_id" class="form-control" placeholder="Enter Citizen ID" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="employee_type" class="form-label">Employee Type:</label>
+                            <input type="text" id="employee_type" name="employee_type" class="form-control" placeholder="Enter Employee Type" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Promote</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Demote Citizen -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0"><i class="fas fa-user-minus"></i> Demote Citizen</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('admin.remove_citizen') }}">
+                        <div class="mb-3">
+                            <label for="remove_citizen_id" class="form-label">Citizen ID:</label>
+                            <input type="text" id="remove_citizen_id" name="citizen_id" class="form-control" placeholder="Enter Citizen ID to Remove" required>
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100">Remove</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Execute SQL Query -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h3 class="mb-0"><i class="fas fa-database"></i> Execute SQL Query</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('admin.admin_dashboard') }}">
+                        <div class="mb-3">
+                            <label for="query" class="form-label">SQL Query:</label>
+                            <textarea name="query" id="query" class="form-control" rows="4" placeholder="Enter SQL query here"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-dark w-100">Execute</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Display Executed Query -->
+            {% if query_executed %}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Executed Query</h4>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">{{ query_executed }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Display Query Results -->
+            {% if result %}
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="fas fa-table"></i> Query Results</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    {% for column in result[0].keys() %}
+                                        <th>{{ column }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in result %}
+                                <tr>
+                                    {% for column in row.keys() %}
+                                    <td>{{ row[column] }}</td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </div>
-        <button type="submit">Promote</button>
-    </form>
-    <!-- Form for Removing a Citizen -->
-    <h3>Demote Citizen</h3>
-    <form method="post" action="{{ url_for('admin.remove_citizen') }}">
-        <div>
-            <label for="remove_citizen_id">Citizen ID:</label>
-            <input type="text" id="remove_citizen_id" name="citizen_id" placeholder="Enter Citizen ID to Remove" required>
-        </div>
-        <button type="submit">Remove</button>
-    </form>
-    <h3>Execute SQL Query</h3>
-    <form method="post" action="{{ url_for('admin.admin_dashboard') }}">
-        <textarea name="query" rows="4" cols="50" placeholder="Enter SQL query here"></textarea><br>
-        <button type="submit">Execute</button>
-    </form>
-    {% if query_executed %}
-        <h4>Executed Query:</h4>
-        <p>{{ query_executed }}</p>
-    {% endif %}
-    {% if result %}
-        <h4>Results:</h4>
-        <table>
-            <tr>
-            {% for column in result[0].keys() %}
-                <th>{{ column }}</th>
-            {% endfor %}
-            </tr>
-            {% for row in result %}
-            <tr>
-                {% for column in row.keys() %}
-                <td>{{ row[column] }}</td>
-                {% endfor %}
-            </tr>
-            {% endfor %}
-        </table>
-    {% endif %}
+    </div>
 </div>
 {% endblock %}

@@ -1,19 +1,36 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="dashboard">
-    <h2>Add Asset Record</h2>
-    <form method="post" action="{{ url_for('employee.employee_add_asset') }}">
-        <label>Asset Type:</label><br>
-        <select name="asset_type">
+<div class="container my-5">
+  <div class="card shadow">
+    <div class="card-header bg-success text-white">
+      <h2 class="mb-0">Add Asset Record</h2>
+    </div>
+    <div class="card-body">
+      <form method="post" action="{{ url_for('employee.employee_add_asset') }}" id="assetForm">
+        <div class="mb-3">
+          <label for="asset_type" class="form-label">Asset Type:</label>
+          <select name="asset_type" id="asset_type" class="form-select">
             <option value="Street Light">Street Light</option>
             <option value="Water Pump">Water Pump</option>
             <option value="Road">Road</option>
-        </select><br>
-        <label>Location:</label><br>
-        <input type="text" name="location" required><br>
-        <label>Installation Date:</label><br>
-        <input type="date" name="installation_date" required><br><br>
-        <button type="submit">Add Asset</button>
-    </form>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="location" class="form-label">Location:</label>
+          <input type="text" name="location" id="location" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label for="installation_date" class="form-label">Installation Date:</label>
+          <input type="date" name="installation_date" id="installation_date" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-success">Add Asset</button>
+      </form>
+    </div>
+  </div>
 </div>
+<script>
+  document.getElementById('assetForm').addEventListener('submit', function(){
+    console.log("Asset form submitted");
+  });
+</script>
 {% endblock %}

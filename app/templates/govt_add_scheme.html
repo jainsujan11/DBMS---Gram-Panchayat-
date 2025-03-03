@@ -1,22 +1,32 @@
-<!-- templates/add_scheme.html -->
 {% extends "base.html" %}
 {% block content %}
-<div class="dashboard">
-    <h2>Add New Scheme</h2>
-    <form action="{{ url_for('govt.govt_add_scheme') }}" method="post">
-        <div>
-            <label for="scheme_number">Scheme Number:</label>
-            <input type="number" id="scheme_number" name="scheme_number" required>
+<div class="container my-5">
+  <div class="card shadow">
+    <div class="card-header bg-success text-white">
+      <h2 class="mb-0">Add New Scheme</h2>
+    </div>
+    <div class="card-body">
+      <form action="{{ url_for('govt.govt_add_scheme') }}" method="post" id="schemeForm">
+        <div class="mb-3">
+          <label for="scheme_number" class="form-label">Scheme Number:</label>
+          <input type="number" id="scheme_number" name="scheme_number" class="form-control" required>
         </div>
-        <div>
-            <label for="scheme_name">Scheme Name:</label>
-            <input type="text" id="scheme_name" name="scheme_name" required>
+        <div class="mb-3">
+          <label for="scheme_name" class="form-label">Scheme Name:</label>
+          <input type="text" id="scheme_name" name="scheme_name" class="form-control" required>
         </div>
-        <div>
-            <label for="scheme_description">Scheme Description:</label>
-            <input type="text" id="scheme_description" name="scheme_description" required>
+        <div class="mb-3">
+          <label for="scheme_description" class="form-label">Scheme Description:</label>
+          <input type="text" id="scheme_description" name="scheme_description" class="form-control" required>
         </div>
-        <button type="submit">Submit</button>
-    </form>
+        <button type="submit" class="btn btn-success">Submit</button>
+      </form>
+    </div>
+  </div>
 </div>
+<script>
+  document.getElementById('schemeForm').addEventListener('submit', function(){
+    console.log("Scheme form submitted");
+  });
+</script>
 {% endblock %}

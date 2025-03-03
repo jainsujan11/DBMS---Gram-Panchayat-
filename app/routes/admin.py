@@ -57,10 +57,22 @@ def add_citizen_employee():
         if(current_type==employee_type):
             flash(f"Citizen {citizen_id} is already {current_type}")
         else:
-            cur.execute("""UPDATE users set user_type=%s where citizen_id=%s""",(employee_type,citizen_id))
-            conn.commit()
-            flash(f"Changed user_type of citizen_id {citizen_id} from {current_type} to {employee_type}")
-            if(current_type=='citizen'):
+            if(len(results) == 1):
+                flash(f"Changed user_type of citizen_id {citizen_id} from {current_type} to {employee_type}")
+                # extract username and password
+                cur.execute("SELECT username, password FROM users WHERE citizen_id = %s", (citizen_id,))
+                user_data = cur.fetchone()  # Fetch the first row of the result
+                username, password = user_data
+
+                # Modify the username by appending '+emp'
+                new_username = f"{username}emp"
+
+                # Insert the new user with the modified username, same password, and role as 'employee'
+                cur.execute("""
+                    INSERT INTO users (username, password, user_type, citizen_id)
+                    VALUES (%s, %s, 'employee', %s)
+                """, (new_username, password, citizen_id))
+                conn.commit()
                 cur.execute("""INSERT INTO panchayat_employees(citizen_id,role) values (%s,%s)""",(citizen_id,employee_type))
             else:
                 cur.execute("""UPDATE panchayat_employees set role=%s where citizen_id=%s""",(employee_type,citizen_id))
@@ -89,8 +101,8 @@ def remove_citizen():
     try:
         # Example: Delete the citizen from the citizens table
         cur.execute("DELETE FROM panchayat_employees WHERE citizen_id = %s", (citizen_id,))
-        flash(f"Citizen with ID {citizen_id} has been removed successfully", "success")
-        cur.execute("UPDATE users set user_type='citizen' where citizen_id=%s",(citizen_id,))
+        flash(f"Citizen with ID {citizen_id} has been removed successfully from panchayat", "success")
+        cur.execute("DELETE FROM users WHERE citizen_id = %s AND user_type = 'employee'", (citizen_id,))
         conn.commit()
     except Exception as e:
         conn.rollback()

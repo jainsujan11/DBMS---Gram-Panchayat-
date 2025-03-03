@@ -19,7 +19,7 @@ app.register_blueprint(govt_bp, url_prefix='/govt')
 
 @app.route('/')
 def index():
-    return "Welcome to Gram Panchayat Management System. <a href='/login'>Login</a>"
+    return render_template('login.html')
 
 @app.route('/dashboard')
 def dashboard():
